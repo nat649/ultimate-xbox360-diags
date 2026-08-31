@@ -3,748 +3,652 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xbox 360 Ultimate Diagnostics</title>
+    <title>360 Diagnostic Wiki - Motherboards & Error Codes</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@700&display=swap');
-
+        /* Classic Forum / Scene Aesthetic */
         :root {
-            --xbox-green: #107C10;
-            --xbox-neon: #39FF14;
-            --bg-dark: #0b0b0f;
-            --bg-surface: rgba(26, 26, 32, 0.7);
-            --bg-card: rgba(35, 35, 45, 0.6);
-            --text-main: #f0f0f5;
-            --text-muted: #9ba1a6;
-            --rrod-red: #ff3333;
-            --glass-border: rgba(255, 255, 255, 0.05);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            --bg-color: #0d0d0d;
+            --panel-bg: #1a1a1a;
+            --border-color: #333333;
+            --text-main: #cccccc;
+            --text-light: #ffffff;
+            --xbox-green: #65b042;
+            --xbox-green-dark: #3a6b24;
+            --alert-red: #ff3333;
+            --alert-bg: #330000;
         }
 
         body {
-            background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(16, 124, 16, 0.05) 0%, transparent 50%),
-                radial-gradient(circle at 85% 30%, rgba(16, 124, 16, 0.08) 0%, transparent 50%);
-            background-attachment: fixed;
+            background-color: var(--bg-color);
+            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                              linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 20px 20px;
             color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            line-height: 1.6;
-            padding-bottom: 80px;
+            font-family: Tahoma, Verdana, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+            padding: 0 0 50px 0;
         }
 
-        /* Glassmorphism Header */
+        #wrapper {
+            max-width: 1100px;
+            margin: 0 auto;
+            border-left: 1px solid var(--border-color);
+            border-right: 1px solid var(--border-color);
+            background-color: #111111;
+            min-height: 100vh;
+        }
+
+        /* Header / Banner */
         header {
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            background: rgba(11, 11, 15, 0.85);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 30px 20px;
-            text-align: center;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            background-color: #000;
+            border-bottom: 3px solid var(--xbox-green);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
 
         header h1 {
-            color: #fff;
-            font-size: 2.5rem;
-            font-weight: 800;
+            color: var(--xbox-green);
+            font-family: "Courier New", Courier, monospace;
+            font-size: 28px;
+            font-weight: bold;
+            margin: 0;
             text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
-            text-shadow: 0 0 15px rgba(16, 124, 16, 0.5);
         }
 
-        header h1 span {
-            color: var(--xbox-neon);
+        header .subtitle {
+            color: #777;
+            font-size: 12px;
         }
 
-        header p {
-            color: var(--text-muted);
-            font-size: 1.1rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        .container {
-            max-width: 1300px;
-            margin: 0 auto;
+        .content-section {
             padding: 20px;
-        }
-
-        section {
-            margin-top: 60px;
-            animation: fadeIn 0.8s ease-out forwards;
         }
 
         h2 {
-            display: flex;
-            align-items: center;
-            color: #fff;
-            font-size: 2rem;
-            margin-bottom: 30px;
+            color: var(--text-light);
+            font-size: 18px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 5px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            text-transform: uppercase;
         }
 
-        h2::before {
-            content: '';
-            display: inline-block;
-            width: 8px;
-            height: 35px;
-            background: var(--xbox-neon);
-            margin-right: 15px;
-            border-radius: 4px;
-            box-shadow: 0 0 10px var(--xbox-green);
+        /* Warning / Info Box */
+        .sticky-post {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-left: 4px solid var(--xbox-green);
+            padding: 15px;
+            margin-bottom: 20px;
         }
 
-        /* Modern Instructions Box */
-        .instructions-box {
-            background: var(--bg-surface);
-            backdrop-filter: blur(10px);
-            padding: 35px;
-            border-radius: 16px;
-            border: 1px solid var(--glass-border);
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+        .sticky-post h3 {
+            margin: 0 0 10px 0;
+            color: var(--text-light);
+            font-size: 15px;
         }
 
-        .instructions-box ol {
-            margin-left: 20px;
-            margin-top: 15px;
-            margin-bottom: 25px;
-        }
-
-        .instructions-box li {
-            margin-bottom: 12px;
-            font-size: 1.1rem;
-        }
-
-        .instructions-box .grid-stats {
+        .code-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-top: 20px;
-            background: rgba(0,0,0,0.3);
-            padding: 20px;
-            border-radius: 12px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+            background-color: #000;
+            padding: 10px;
+            border: 1px solid #222;
         }
 
-        .grid-stats div {
-            display: flex;
-            align-items: center;
-            font-size: 1.1rem;
-            font-family: 'JetBrains Mono', monospace;
+        .code-grid div {
+            font-family: "Courier New", Courier, monospace;
+            color: #999;
         }
-
-        .grid-stats span {
-            color: var(--rrod-red);
-            font-size: 1.5rem;
-            margin-right: 10px;
-            text-shadow: 0 0 10px rgba(255,51,51,0.5);
-        }
-
-        .highlight-red { color: var(--rrod-red); font-weight: bold; text-shadow: 0 0 8px rgba(255, 51, 51, 0.4); }
-        .highlight-green { color: var(--xbox-neon); font-weight: bold; }
+        .code-grid span { color: var(--alert-red); font-weight: bold; }
 
         /* Motherboard Grid */
-        .mobo-grid {
+        .mobo-container {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
         }
 
-        .mobo-card {
-            background: var(--bg-card);
-            backdrop-filter: blur(8px);
-            border: 1px solid var(--glass-border);
-            border-radius: 16px;
-            padding: 25px;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        @media (max-width: 768px) {
+            .mobo-container { grid-template-columns: 1fr; }
         }
 
-        .mobo-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: var(--xbox-green);
-            transition: background 0.3s;
+        .mobo-box {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 15px;
         }
 
-        .mobo-card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.6), 0 0 15px rgba(16, 124, 16, 0.2);
-            border-color: rgba(57, 255, 20, 0.2);
-        }
-
-        .mobo-card:hover::before {
-            background: var(--xbox-neon);
-            box-shadow: 0 0 15px var(--xbox-neon);
-        }
-
-        .mobo-card.highlight {
-            border: 1px solid rgba(57, 255, 20, 0.3);
-            background: rgba(16, 124, 16, 0.05);
-        }
-
-        .mobo-card h3 {
-            color: #fff;
-            margin-bottom: 15px;
-            font-size: 1.6rem;
+        .mobo-box h4 {
+            margin: 0 0 10px 0;
+            color: var(--xbox-green);
+            font-size: 16px;
+            border-bottom: 1px dotted #444;
+            padding-bottom: 5px;
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
 
-        .badge {
-            font-size: 0.75rem;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 4px 10px;
-            border-radius: 20px;
-            letter-spacing: 1px;
-            text-transform: uppercase;
+        .mobo-box .year {
+            color: #666;
+            font-size: 12px;
         }
 
-        .badge-fixed { background: rgba(16, 124, 16, 0.2); color: var(--xbox-neon); border: 1px solid var(--xbox-green); }
+        .mobo-box.highlight {
+            border-color: var(--xbox-green-dark);
+            background-color: #141f10;
+        }
 
-        .mobo-card ul {
+        .mobo-stats {
             list-style: none;
-            color: var(--text-muted);
-            font-size: 1rem;
+            padding: 0;
+            margin: 0 0 10px 0;
         }
 
-        .mobo-card ul li {
-            margin-bottom: 12px;
-            display: flex;
-            flex-direction: column;
+        .mobo-stats li {
+            margin-bottom: 5px;
+            font-size: 13px;
         }
 
-        .mobo-card ul li strong {
-            color: var(--text-main);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
+        .mobo-stats strong {
+            color: var(--text-light);
         }
 
-        /* Database Section */
-        .search-container {
-            margin-bottom: 30px;
-            position: relative;
+        .mobo-desc {
+            font-size: 12px;
+            color: #aaa;
+            border-top: 1px solid #222;
+            padding-top: 10px;
         }
 
-        #searchInput {
+        /* Database Table */
+        .search-bar {
+            background-color: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        #searchBox {
             width: 100%;
-            padding: 20px 20px 20px 60px;
-            font-size: 1.2rem;
-            background: var(--bg-surface);
-            border: 1px solid var(--glass-border);
-            color: #fff;
-            border-radius: 12px;
-            outline: none;
-            transition: all 0.3s;
-            font-family: 'Inter', sans-serif;
-            backdrop-filter: blur(10px);
-        }
-
-        #searchInput:focus {
-            border-color: var(--xbox-neon);
-            box-shadow: 0 0 20px rgba(16, 124, 16, 0.2);
-            background: rgba(35, 35, 45, 0.8);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 1.5rem;
+            box-sizing: border-box;
+            background-color: #000;
+            border: 1px solid #444;
             color: var(--xbox-green);
+            padding: 8px;
+            font-family: Tahoma, sans-serif;
+            font-size: 14px;
         }
 
-        .table-wrapper {
-            border-radius: 16px;
-            overflow: hidden;
-            border: 1px solid var(--glass-border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            background: var(--bg-surface);
-            backdrop-filter: blur(10px);
+        #searchBox:focus {
+            outline: none;
+            border-color: var(--xbox-green);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        th, td {
+            border: 1px solid var(--border-color);
+            padding: 10px;
             text-align: left;
         }
 
         th {
-            background: rgba(0, 0, 0, 0.6);
-            color: var(--xbox-neon);
-            font-weight: 600;
-            text-transform: uppercase;
-            padding: 20px;
-            font-size: 0.95rem;
-            letter-spacing: 1px;
-            border-bottom: 2px solid var(--glass-border);
+            background-color: #222;
+            color: var(--text-light);
+            font-weight: bold;
         }
 
-        td {
-            padding: 18px 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            vertical-align: middle;
+        tr:nth-child(even) {
+            background-color: #161616;
         }
 
-        tr { transition: background 0.2s; }
-        tr:hover { background: rgba(255, 255, 255, 0.03); }
+        tr:hover {
+            background-color: #2a2a2a;
+        }
 
-        .code-col {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 1.2rem;
-            color: #fff;
-            background: rgba(0,0,0,0.4);
-            padding: 8px 12px;
-            border-radius: 6px;
+        .error-code {
+            font-family: "Courier New", Courier, monospace;
+            font-weight: bold;
+            color: var(--text-light);
+            background-color: #000;
+            padding: 3px 6px;
+            border: 1px solid #333;
+        }
+
+        .e-code {
+            color: #ff9900;
+        }
+
+        .sys-tag {
+            font-size: 11px;
+            background-color: #333;
+            color: #ccc;
+            padding: 2px 5px;
+            margin-right: 4px;
             display: inline-block;
-            border-left: 3px solid var(--rrod-red);
-        }
-
-        .e-code { border-left-color: #ff9900; }
-        
-        .tag {
-            display: inline-block;
-            background: rgba(255,255,255,0.08);
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.85rem;
-            margin-right: 5px;
-            margin-bottom: 5px;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-            header h1 { font-size: 1.8rem; }
-            .mobo-grid { grid-template-columns: 1fr; }
-            th, td { padding: 12px; font-size: 0.95rem; }
-            .code-col { font-size: 1.05rem; }
-            #searchInput { font-size: 1rem; padding: 15px 15px 15px 50px; }
-            .search-icon { font-size: 1.2rem; }
         }
     </style>
 </head>
 <body>
 
+<div id="wrapper">
     <header>
-        <h1>Xbox 360 <span>Ultimate</span> Diagnostics</h1>
-        <p>Advanced Motherboard Revisions & Deep Secondary Error Codes</p>
+        <div>
+            <h1>360 Hardware Scene</h1>
+            <div class="subtitle">Index // Hardware Revisions & Secondary Error Code Dump</div>
+        </div>
+        <div class="subtitle">Updated: 2026</div>
     </header>
 
-    <div class="container">
+    <div class="content-section">
         
-        <!-- INSTRUCTIONS -->
-        <section>
-            <h2>Retrieving Secondary Error Codes</h2>
-            <div class="instructions-box">
-                <p>When your console displays the <span class="highlight-red">Red Ring of Death (RROD)</span> (1, 3, or 4 flashing red lights), a hidden 4-digit secondary error code pinpoints the exact hardware failure. The dashboard E-codes (like E74) also have matching secondary codes.</p>
-                <ol>
-                    <li>Turn the Xbox 360 on and wait for the front ring to flash red.</li>
-                    <li>Press and <strong>hold</strong> the <span class="highlight-green">Sync button</span> (used for controllers).</li>
-                    <li>While holding Sync, press the <strong>Eject button</strong> on the DVD drive once.</li>
-                    <li>The lights will change pattern. Count the flashing quadrants.</li>
-                    <li>Release Eject, press it again (still holding Sync). Do this <strong>4 times total</strong> to reveal the 4 digits.</li>
-                </ol>
-                <div class="grid-stats">
-                    <div><span>●●●●</span> 4 Lights = 0</div>
-                    <div><span>●○○○</span> 1 Light = 1</div>
-                    <div><span>●●○○</span> 2 Lights = 2</div>
-                    <div><span>●●●○</span> 3 Lights = 3</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- MOTHERBOARDS -->
-        <section>
-            <h2>Motherboard Deep Dive</h2>
-            <div class="mobo-grid">
-                <!-- Xenon -->
-                <div class="mobo-card">
-                    <h3>Xenon <span class="badge">2005</span></h3>
-                    <ul>
-                        <li><strong>Models</strong> Core / Premium (No HDMI)</li>
-                        <li><strong>CPU / GPU</strong> 90nm / 90nm (Elston)</li>
-                        <li><strong>Power Supply</strong> 203W (16.5A)</li>
-                        <li><strong>Analysis</strong> The launch board. Plagued by 0102/0110 GPU BGA failures due to low-TG underfill combined with extreme thermal cycles. High failure rate.</li>
-                    </ul>
-                </div>
-                <!-- Zephyr -->
-                <div class="mobo-card">
-                    <h3>Zephyr <span class="badge">2007</span></h3>
-                    <ul>
-                        <li><strong>Models</strong> Elite / Premium (HDMI)</li>
-                        <li><strong>CPU / GPU</strong> 90nm / 90nm</li>
-                        <li><strong>Power Supply</strong> 203W (16.5A)</li>
-                        <li><strong>Analysis</strong> Added HDMI and the HANA scaler chip. Inherited the exact same flawed 90nm GPU design. Highly prone to E74 and 0102.</li>
-                    </ul>
-                </div>
-                <!-- Early Falcon -->
-                <div class="mobo-card">
-                    <h3>Early Falcon <span class="badge">Late 2007</span></h3>
-                    <ul>
-                        <li><strong>Models</strong> Arcade / Pro (60GB) / Elite</li>
-                        <li><strong>CPU / GPU</strong> 65nm / 90nm</li>
-                        <li><strong>Power Supply</strong> 175W (14.2A)</li>
-                        <li><strong>Analysis</strong> Introduced a cooler 65nm CPU, but kept the old 90nm GPU packaging. E74 (GPU-to-HANA connection break) spiked massively on these early boards.</li>
-                    </ul>
-                </div>
-                <!-- Late Falcon -->
-                <div class="mobo-card highlight">
-                    <h3>Late Falcon (v2) <span class="badge badge-fixed">Mid 2008</span></h3>
-                    <ul>
-                        <li><strong>Models</strong> Late Pro / Arcade Bundles</li>
-                        <li><strong>CPU / GPU</strong> 65nm / 80nm (Rhea)</li>
-                        <li><strong>Power Supply</strong> 175W (14.2A)</li>
-                        <li><strong>Analysis</strong> A crucial mid-generation stealth fix. Microsoft quietly swapped to the high-TG underfill "Rhea" GPU. If your Falcon has a 2008 manufacture date, it is drastically more reliable and highly resilient against RROD.</li>
-                    </ul>
-                </div>
-                <!-- Opus -->
-                <div class="mobo-card">
-                    <h3>Opus <span class="badge">2008</span></h3>
-                    <ul>
-                        <li><strong>Models</strong> Microsoft Warranty Repairs Only</li>
-                        <li><strong>CPU / GPU</strong> 65nm / 80nm</li>
-                        <li><strong>Power Supply</strong> 175W (14.2A) - No HDMI</li>
-                        <li><strong>Analysis</strong> A Falcon architecture shaped to fit inside broken Xenon chassis (lacking an HDMI cutout) to fulfill repair center warranties.</li>
-                    </ul>
-                </div>
-                <!-- Jasper -->
-                <div class="mobo-card">
-                    <h3>Jasper <span class="badge">Late 2008</span></h3>
-                    <ul>
-                        <li><strong>Models</strong> Arcade / Pro / Elite</li>
-                        <li><strong>CPU / GPU</strong> 65nm / 65nm</li>
-                        <li><strong>Power Supply</strong> 150W (12.1A)</li>
-                        <li><strong>Analysis</strong> The true cure. Shrunk the GPU to 65nm, effectively solving the heat and underfill RROD issues. 16MB/256MB/512MB onboard memory variants for Arcade units.</li>
-                    </ul>
-                </div>
-                <!-- Tonasket (Kronos) -->
-                <div class="mobo-card highlight">
-                    <h3>Tonasket / Kronos <span class="badge badge-fixed">Late 2009</span></h3>
-                    <ul>
-                        <li><strong>Models</strong> Final Phat Runs (Super Elite)</li>
-                        <li><strong>CPU / GPU</strong> 65nm / 65nm (with 65nm eDRAM)</li>
-                        <li><strong>Power Supply</strong> 150W (12.1A)</li>
-                        <li><strong>Analysis</strong> Often called Jasper v2. Reduced eDRAM size, altered GPU layout. Widely regarded by the community as the most indestructible Xbox 360 motherboard ever manufactured.</li>
-                    </ul>
-                </div>
-                <!-- Trinity -->
-                <div class="mobo-card">
-                    <h3>Trinity <span class="badge">2010</span></h3>
-                    <ul>
-                        <li><strong>Models</strong> Xbox 360 S (Slim) - Glossy</li>
-                        <li><strong>CPU / GPU</strong> 45nm CGPU (Combined)</li>
-                        <li><strong>Power Supply</strong> 135W (10.83A)</li>
-                        <li><strong>Analysis</strong> First Slim. Unified CPU/GPU die. Contains HANA chip. Excellent reliability. Failures usually result in the "Red Dot of Death" (0101).</li>
-                    </ul>
-                </div>
-                <!-- Corona -->
-                <div class="mobo-card">
-                    <h3>Corona (V1-V6) <span class="badge">2011-2013</span></h3>
-                    <ul>
-                        <li><strong>Models</strong> Xbox 360 S / Xbox 360 E</li>
-                        <li><strong>CPU / GPU</strong> 45nm CGPU</li>
-                        <li><strong>Power Supply</strong> 120W / 115W (9.6A)</li>
-                        <li><strong>Analysis</strong> Removed the HANA chip (integrated into Southbridge). Introduced 4GB eMMC NANDs. Southbridge failure is the most common issue here.</li>
-                    </ul>
-                </div>
-                <!-- Winchester -->
-                <div class="mobo-card">
-                    <h3>Winchester <span class="badge">2014</span></h3>
-                    <ul>
-                        <li><strong>Models</strong> Late Xbox 360 E (Stingray)</li>
-                        <li><strong>CPU / GPU</strong> 45nm CGPU (No IHS)</li>
-                        <li><strong>Power Supply</strong> 115W (9.6A)</li>
-                        <li><strong>Analysis</strong> Final board. Missing the Integrated Heat Spreader (IHS). Completely patched against RGH/Modding. Tank-like reliability.</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-
-        <!-- DIAGNOSTIC DATABASE -->
-        <section>
-            <h2>Comprehensive Error Database</h2>
-            <div class="search-container">
-                <span class="search-icon">⌕</span>
-                <input type="text" id="searchInput" placeholder="Search for Code (e.g., 0102, E74, 1022), Board, or Symptom...">
-            </div>
-
-            <div class="table-wrapper">
-                <table id="codeTable">
-                    <thead>
-                        <tr>
-                            <th>Error Code</th>
-                            <th>Sub-System</th>
-                            <th>Primary Affected Boards</th>
-                            <th>Technical Diagnosis & Resolution</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- 00xx Codes -->
-                        <tr>
-                            <td><span class="code-col">0001</span></td>
-                            <td><span class="tag">Power</span> <span class="tag">PSU</span></td>
-                            <td>All Phats</td>
-                            <td>Short on the 12V line. Verify external power supply works first. If PSU is good, check the MOSFETs near the main power connector for a short to ground.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0002</span></td>
-                            <td><span class="tag">Power</span> <span class="tag">Ethernet</span></td>
-                            <td>Xenon, Zephyr</td>
-                            <td>CPU Vcore short or Network Interface short. Often a blown CPU MOSFET, or occasionally a shorted Ethernet transformer chip on the rear of the board.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0003</span></td>
-                            <td><span class="tag">Power</span> <span class="tag">GPU</span></td>
-                            <td>All</td>
-                            <td>GPU Vcore short. A power supply phase feeding the GPU has failed (bad MOSFET/capacitor) or the silicon inside the GPU is internally shorted.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0010</span></td>
-                            <td><span class="tag">Thermal</span> <span class="tag">SB</span></td>
-                            <td>Xenon, Zephyr</td>
-                            <td>Southbridge overheating. Check thermal paste and mounting on the Southbridge. Alternatively, indicates severed solder joints beneath the SB chip.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0011</span></td>
-                            <td><span class="tag">Thermal</span> <span class="tag">CPU</span></td>
-                            <td>Xenon, Zephyr, Falcon</td>
-                            <td>CPU Overheating. The heatsink is unseated, thermal paste is fully dry, or fans have completely failed. Usually an easy physical fix.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0012</span></td>
-                            <td><span class="tag">Thermal</span> <span class="tag">GPU</span></td>
-                            <td>Xenon, Zephyr, Falcon</td>
-                            <td>GPU Overheating. Check GPU heatsink seating. Ensure the x-clamps haven't lost tension.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0013</span></td>
-                            <td><span class="tag">Thermal</span> <span class="tag">RAM</span></td>
-                            <td>All Phats</td>
-                            <td>RAM Overheating. Most commonly caused by the "penny trick" or bolt-mods that over-torqued the board, bending it and stressing the RAM thermal pads.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0020</span></td>
-                            <td><span class="tag">Boot</span> <span class="tag">GPU</span></td>
-                            <td>All Phats</td>
-                            <td>GPU failed to respond during POST. Usually signifies a dying GPU die (bump failure) requiring replacement, or cold joints under the GPU.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0021</span></td>
-                            <td><span class="tag">Boot</span> <span class="tag">SB</span></td>
-                            <td>Xenon, Falcon</td>
-                            <td>DVD Drive timeout or Southbridge failure. If testing without a DVD drive connected and you get this, the Southbridge is dead or has broken joints.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0022</span></td>
-                            <td><span class="tag">CPU</span> <span class="tag">NAND</span></td>
-                            <td>Jasper, Slims</td>
-                            <td>CPU failure, broken PLL lines, or bad NAND data. On RGH consoles, this usually means an incorrect CPU key or bad soldering. On retails, fatal CPU failure.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0023</span></td>
-                            <td><span class="tag">Boot</span> <span class="tag">SB</span></td>
-                            <td>All</td>
-                            <td>Southbridge to CPU connection error. Usually points to a failing Southbridge or a lifted pad along the front-side bus.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0031</span></td>
-                            <td><span class="tag">RAM</span></td>
-                            <td>All</td>
-                            <td>RAM short circuit. A memory chip is physically damaged, bridged, or has detached from the motherboard via a cracked solder joint.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0032</span></td>
-                            <td><span class="tag">RAM</span> <span class="tag">CPU</span></td>
-                            <td>Xenon, Zephyr</td>
-                            <td>CPU to RAM communication failure. Can be a bad CPU, but often related to microscopic board warping snapping traces under the CPU.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0033</span></td>
-                            <td><span class="tag">RAM</span></td>
-                            <td>All Phats</td>
-                            <td>RAM configuration error. Solder joints under one of the RAM modules have failed. Reflow/Reball of the memory chips required.</td>
-                        </tr>
-
-                        <!-- 01xx Codes -->
-                        <tr>
-                            <td><span class="code-col">0100</span></td>
-                            <td><span class="tag">GPU</span> <span class="tag">RAM</span></td>
-                            <td>Xenon, Zephyr</td>
-                            <td>Cold solder joint under a RAM chip or the GPU itself. Highly common when consoles underwent extreme thermal cycling in damp environments.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0101</span></td>
-                            <td><span class="tag">USB</span> <span class="tag">SB</span></td>
-                            <td>Corona, Trinity</td>
-                            <td>Bridged USB ports or dead Southbridge. Inspect physical USB ports for bent pins touching the shield. If clear, Southbridge has failed (extremely common on Corona).</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0102</span></td>
-                            <td><span class="tag">GPU</span> <span class="tag">BGA</span></td>
-                            <td>Xenon, Early Falcon</td>
-                            <td><strong>The Classic RROD.</strong> Low-TG underfill beneath the GPU chip failed, breaking solder bumps between the silicon die and the green substrate. Requires permanent GPU replacement with a fixed revision.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0103</span></td>
-                            <td><span class="tag">GPU</span> <span class="tag">CPU</span></td>
-                            <td>Zephyr, Falcon</td>
-                            <td>CPU to GPU communication error. Structurally identical diagnosis to 0102; the GPU die underfill has failed.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0104</span></td>
-                            <td><span class="tag">GPU</span> <span class="tag">Unknown</span></td>
-                            <td>All Phats</td>
-                            <td>Undocumented specific failure, but heavily tied to the GPU power phasing or cold joints on the GPU core voltage regulators.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">0110</span></td>
-                            <td><span class="tag">RAM</span></td>
-                            <td>All</td>
-                            <td>Memory error. The GPU cannot communicate with the RAM. Either a dead RAM chip or a damaged solder pad under a RAM module. Often fixable with a RAM reball.</td>
-                        </tr>
-
-                        <!-- 02xx & 10xx Codes -->
-                        <tr>
-                            <td><span class="code-col">0203</span></td>
-                            <td><span class="tag">Thermal</span></td>
-                            <td>Phats</td>
-                            <td>System control thermal failure. Generally points back to cracked solder joints underneath the GPU caused by severe board warping.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">1001</span></td>
-                            <td><span class="tag">DVD Drive</span></td>
-                            <td>All</td>
-                            <td>DVD Drive error. The drive is receiving improper voltage, or the firmware on the DVD PCB is catastrophically corrupted.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">1003</span></td>
-                            <td><span class="tag">Storage</span> <span class="tag">HDD</span></td>
-                            <td>All</td>
-                            <td>Hard Drive short. Remove the hard drive. If the console boots normally, the HDD enclosure, connector, or internal drive is dead.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">1010</span></td>
-                            <td><span class="tag">Storage</span></td>
-                            <td>All</td>
-                            <td>Matches E68. eFUSE mismatch or Hard drive error. Remove the HDD and try booting.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">1013</span></td>
-                            <td><span class="tag">Dashboard</span></td>
-                            <td>All</td>
-                            <td>Corrupt dashboard update. Console failed halfway through a system update. Often recoverable by putting the update on a USB drive and booting.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">1020</span></td>
-                            <td><span class="tag">Network</span></td>
-                            <td>All</td>
-                            <td>Ethernet port or networking subsystem failure.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">1021</span></td>
-                            <td><span class="tag">Network</span> <span class="tag">SB</span></td>
-                            <td>Phats</td>
-                            <td>Southbridge failure relating to the network interface. Component failure near the ethernet PHY chip.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">1022</span></td>
-                            <td><span class="tag">AV</span> <span class="tag">HANA</span></td>
-                            <td>Zephyr, Falcon</td>
-                            <td>Matches E74. The AV cable is faulty (common with heavy Component cables pulling on the port), the HANA scaler chip has failed, or the GPU-to-HANA traces broke.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">1023</span></td>
-                            <td><span class="tag">DVD Drive</span></td>
-                            <td>All</td>
-                            <td>DVD drive is not connected, or the SATA data cable connecting the DVD drive to the Southbridge is faulty/damaged.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col">1033</span></td>
-                            <td><span class="tag">CPU</span></td>
-                            <td>Jasper, Trinity</td>
-                            <td>Fatal CPU failure. The CPU cannot initialize during the very first stages of POST. Unrepairable without a donor CPU and matching NAND.</td>
-                        </tr>
-
-                        <!-- Primary E-Codes -->
-                        <tr>
-                            <td><span class="code-col e-code">E64 / E65</span></td>
-                            <td><span class="tag">DVD Drive</span></td>
-                            <td>All</td>
-                            <td>DVD Drive Firmware error. The dashboard detects a drive, but the firmware version doesn't match the expected OSKV (often caused by bad flashed firmware).</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col e-code">E66</span></td>
-                            <td><span class="tag">DVD Drive</span></td>
-                            <td>All</td>
-                            <td>DVD Drive model mismatch. The dashboard expects one drive brand (e.g., Lite-On) but detects another (e.g., BenQ) and the firmware is strictly checking.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col e-code">E67 / E68</span></td>
-                            <td><span class="tag">Storage</span></td>
-                            <td>All</td>
-                            <td>Hard Drive timeout or read/write error. Remove the hard drive. If the console boots, replace the hard drive.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col e-code">E71 / E79</span></td>
-                            <td><span class="tag">Dashboard</span> <span class="tag">NAND</span></td>
-                            <td>All</td>
-                            <td>Dashboard update error or corrupted file system. Try clearing the system cache (hold sync button while booting). Can also indicate failing NAND flash blocks.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col e-code">E73</span></td>
-                            <td><span class="tag">Network</span> <span class="tag">HANA</span></td>
-                            <td>Zephyr, Falcon</td>
-                            <td>Hardware failure on the Ethernet port or HANA chip. Check ethernet pins. If clear, the HANA chip needs reflowing or replacing.</td>
-                        </tr>
-                        <tr>
-                            <td><span class="code-col e-code">E74</span></td>
-                            <td><span class="tag">GPU</span> <span class="tag">HANA</span></td>
-                            <td>Falcon</td>
-                            <td>Secondary code 1022. Breakdown of communication between GPU and HANA chip. Almost always a dying GPU die requiring replacement.</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    </div>
-
-    <script>
-        // Real-time search filter
-        const searchInput = document.getElementById('searchInput');
-        const tableRows = document.querySelectorAll('#codeTable tbody tr');
-
-        searchInput.addEventListener('keyup', function() {
-            const filter = this.value.toUpperCase();
+        <!-- HOW TO READ CODES -->
+        <h2>[Tutorial] Retrieving Secondary Error Codes</h2>
+        <div class="sticky-post">
+            <h3>Read this before posting asking what your RROD means.</h3>
+            <p>If your console has 1, 3, or 4 flashing red lights on the Ring of Light, you have a hardware failure. The dashboard E-codes (like E74) also have corresponding hidden codes. Don't just guess or bake your motherboard in a towel. Get the exact code.</p>
             
-            tableRows.forEach(row => {
-                const textValue = row.textContent || row.innerText;
-                if (textValue.toUpperCase().indexOf(filter) > -1) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
-        });
-    </script>
+            <ol>
+                <li>Turn the console on and wait for the red lights to flash.</li>
+                <li>Press and <strong>hold</strong> the Sync button on the front.</li>
+                <li>While holding Sync, press the <strong>Eject</strong> button on the DVD drive once.</li>
+                <li>The flashing lights will change. Count the illuminated quadrants.</li>
+                <li>Release Eject, then press it again (while still holding Sync). Do this <strong>4 times total</strong> to get your 4 digits.</li>
+            </ol>
+
+            <div class="code-grid">
+                <div><span>●●●●</span> = 0</div>
+                <div><span>●○○○</span> = 1</div>
+                <div><span>●●○○</span> = 2</div>
+                <div><span>●●●○</span> = 3</div>
+            </div>
+        </div>
+
+        <!-- MOTHERBOARD INDEX -->
+        <h2>[Info] Xbox 360 Motherboard Revisions</h2>
+        <div class="mobo-container">
+            
+            <!-- Xenon -->
+            <div class="mobo-box">
+                <h4>Xenon <span class="year">2005 (Launch)</span></h4>
+                <ul class="mobo-stats">
+                    <li><strong>Models:</strong> Core / Premium (No HDMI)</li>
+                    <li><strong>Process:</strong> 90nm CPU / 90nm GPU</li>
+                    <li><strong>PSU:</strong> 203W (16.5A)</li>
+                </ul>
+                <div class="mobo-desc">
+                    The launch board. Notorious for a massive failure rate. Plagued by 0102/0110 errors caused by poor low-TG underfill on the GPU BGA failing under thermal stress. Avoid buying these.
+                </div>
+            </div>
+
+            <!-- Zephyr -->
+            <div class="mobo-box">
+                <h4>Zephyr <span class="year">2007</span></h4>
+                <ul class="mobo-stats">
+                    <li><strong>Models:</strong> Elite / Premium (Added HDMI)</li>
+                    <li><strong>Process:</strong> 90nm CPU / 90nm GPU</li>
+                    <li><strong>PSU:</strong> 203W (16.5A)</li>
+                </ul>
+                <div class="mobo-desc">
+                    Added the HDMI port and the HANA scaler chip. Unfortunately, it uses the exact same flawed 90nm GPU design as Xenon. Extremely prone to E74 and 0102.
+                </div>
+            </div>
+
+            <!-- Early Falcon -->
+            <div class="mobo-box">
+                <h4>Early Falcon <span class="year">Late 2007</span></h4>
+                <ul class="mobo-stats">
+                    <li><strong>Models:</strong> Arcade / Pro / Elite</li>
+                    <li><strong>Process:</strong> 65nm CPU / 90nm GPU</li>
+                    <li><strong>PSU:</strong> 175W (14.2A)</li>
+                </ul>
+                <div class="mobo-desc">
+                    Introduced a cooler 65nm CPU. However, it kept the old 90nm GPU. Because of the HANA chip and board layout, E74 (connection break between GPU and HANA) spiked massively here.
+                </div>
+            </div>
+
+            <!-- Late Falcon / Rhea -->
+            <div class="mobo-box highlight">
+                <h4>Late Falcon (v2) <span class="year">Mid 2008 (The Fix)</span></h4>
+                <ul class="mobo-stats">
+                    <li><strong>Models:</strong> Late Pro / Arcade</li>
+                    <li><strong>Process:</strong> 65nm CPU / 80nm GPU (Rhea)</li>
+                    <li><strong>PSU:</strong> 175W (14.2A)</li>
+                </ul>
+                <div class="mobo-desc">
+                    A stealth revision by Microsoft. They swapped the GPU to an 80nm "Rhea" chip with high-TG underfill. If you have a Falcon manufactured in mid-to-late 2008, it is highly resilient to RROD. A solid board.
+                </div>
+            </div>
+
+            <!-- Opus -->
+            <div class="mobo-box">
+                <h4>Opus <span class="year">2008</span></h4>
+                <ul class="mobo-stats">
+                    <li><strong>Models:</strong> Warranty Replacements Only</li>
+                    <li><strong>Process:</strong> 65nm CPU / 80nm GPU</li>
+                    <li><strong>PSU:</strong> 175W (14.2A) - No HDMI</li>
+                </ul>
+                <div class="mobo-desc">
+                    A Frankenstein board. This is a Falcon architecture reshaped to fit inside a broken Xenon case (which lacks an HDMI cutout). Used solely for Microsoft repair center returns.
+                </div>
+            </div>
+
+            <!-- Jasper -->
+            <div class="mobo-box">
+                <h4>Jasper <span class="year">Late 2008</span></h4>
+                <ul class="mobo-stats">
+                    <li><strong>Models:</strong> Arcade / Pro / Elite</li>
+                    <li><strong>Process:</strong> 65nm CPU / 65nm GPU</li>
+                    <li><strong>PSU:</strong> 150W (12.1A)</li>
+                </ul>
+                <div class="mobo-desc">
+                    The true fix. Shrunk the GPU to 65nm, finally eliminating the massive heat and underfill issues. Arcade units had 16MB/256MB/512MB internal memory built onto the board.
+                </div>
+            </div>
+
+            <!-- Tonasket -->
+            <div class="mobo-box highlight">
+                <h4>Tonasket (Kronos) <span class="year">Late 2009</span></h4>
+                <ul class="mobo-stats">
+                    <li><strong>Models:</strong> Final Phat Runs (Super Elite)</li>
+                    <li><strong>Process:</strong> 65nm CPU / 65nm GPU (65nm eDRAM)</li>
+                    <li><strong>PSU:</strong> 150W (12.1A)</li>
+                </ul>
+                <div class="mobo-desc">
+                    Often called "Jasper v2". Reduced the physical size of the eDRAM on the GPU. Widely considered by the modding scene to be the most bulletproof Xbox 360 motherboard ever made.
+                </div>
+            </div>
+
+            <!-- Trinity -->
+            <div class="mobo-box">
+                <h4>Trinity <span class="year">2010</span></h4>
+                <ul class="mobo-stats">
+                    <li><strong>Models:</strong> Xbox 360 S (Glossy)</li>
+                    <li><strong>Process:</strong> 45nm CGPU (Combined)</li>
+                    <li><strong>PSU:</strong> 135W (10.83A)</li>
+                </ul>
+                <div class="mobo-desc">
+                    First Slim board. Combined the CPU and GPU into one chip (CGPU). Kept the HANA chip. Very reliable. When it fails, it usually throws a "Red Dot of Death" (0101).
+                </div>
+            </div>
+
+            <!-- Corona -->
+            <div class="mobo-box">
+                <h4>Corona (V1 - V6) <span class="year">2011 - 2013</span></h4>
+                <ul class="mobo-stats">
+                    <li><strong>Models:</strong> Xbox 360 S / Xbox 360 E</li>
+                    <li><strong>Process:</strong> 45nm CGPU</li>
+                    <li><strong>PSU:</strong> 120W / 115W (9.6A)</li>
+                </ul>
+                <div class="mobo-desc">
+                    Removed the HANA chip and integrated it into the Southbridge. Introduced 4GB eMMC NANDs. Southbridge failures and dead 4GB NANDs are the most common faults here.
+                </div>
+            </div>
+
+            <!-- Winchester -->
+            <div class="mobo-box">
+                <h4>Winchester <span class="year">2014</span></h4>
+                <ul class="mobo-stats">
+                    <li><strong>Models:</strong> Late Xbox 360 E</li>
+                    <li><strong>Process:</strong> 45nm CGPU (No IHS)</li>
+                    <li><strong>PSU:</strong> 115W (9.6A)</li>
+                </ul>
+                <div class="mobo-desc">
+                    The final revision. Microsoft removed the metal Integrated Heat Spreader (IHS) from the CGPU. Unmoddable (RGH patched). Extremely reliable hardware-wise.
+                </div>
+            </div>
+        </div>
+
+        <!-- ERROR DATABASE -->
+        <h2>[Database] Complete Error Code List</h2>
+        
+        <div class="search-bar">
+            <input type="text" id="searchBox" placeholder="Filter by Code (e.g. 0102, E74), Board, or keyword...">
+        </div>
+
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th width="15%">Code</th>
+                    <th width="15%">Sub-System</th>
+                    <th width="20%">Common Boards</th>
+                    <th width="50%">Scene Diagnosis & Fix</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 00xx -->
+                <tr>
+                    <td><span class="error-code">0001</span></td>
+                    <td><span class="sys-tag">Power</span></td>
+                    <td>All Phats</td>
+                    <td>12V line short. Test with a known working PSU. If it still fails, check the MOSFETs near the main power connector on the motherboard for a short to ground.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0002</span></td>
+                    <td><span class="sys-tag">Power/Eth</span></td>
+                    <td>Xenon, Zephyr</td>
+                    <td>CPU Vcore short. Usually a blown CPU MOSFET. Can also be a shorted Ethernet transformer chip on the back of the board.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0003</span></td>
+                    <td><span class="sys-tag">Power/GPU</span></td>
+                    <td>All</td>
+                    <td>GPU Vcore short. A power supply phase feeding the GPU is dead (bad MOSFET or capacitor) or the silicon inside the GPU is internally shorted.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0010</span></td>
+                    <td><span class="sys-tag">SB</span></td>
+                    <td>Xenon, Zephyr</td>
+                    <td>Southbridge is overheating or has cold joints. Check thermal connection. If fine, the chip may need a reflow/reball.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0011</span></td>
+                    <td><span class="sys-tag">CPU</span></td>
+                    <td>Phats</td>
+                    <td>CPU Overheating. Heatsink is unseated, thermal paste is dust, or fans have failed. Easiest RROD to fix.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0012</span></td>
+                    <td><span class="sys-tag">GPU</span></td>
+                    <td>Phats</td>
+                    <td>GPU Overheating. Check GPU heatsink seating. Ensure the x-clamps haven't popped off or lost tension.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0013</span></td>
+                    <td><span class="sys-tag">RAM</span></td>
+                    <td>Phats</td>
+                    <td>RAM Overheating. Often caused by terrible "penny tricks" or bolt-mods that bent the board and stressed the RAM thermal pads.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0020</span></td>
+                    <td><span class="sys-tag">GPU Boot</span></td>
+                    <td>All Phats</td>
+                    <td>GPU failed to respond to POST. Usually signifies a dying GPU die (bump failure) requiring chip replacement.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0021</span></td>
+                    <td><span class="sys-tag">DVD / SB</span></td>
+                    <td>Xenon, Falcon</td>
+                    <td>DVD Drive timeout or Southbridge failure. If testing a bare board with no DVD drive connected, your Southbridge is dead.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0022</span></td>
+                    <td><span class="sys-tag">CPU / NAND</span></td>
+                    <td>Jasper, Slims</td>
+                    <td>Fatal CPU failure or bad NAND data. On RGH consoles, means wrong CPU key or bad PLL soldering. On retail, usually unrepairable CPU death.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0023</span></td>
+                    <td><span class="sys-tag">SB</span></td>
+                    <td>All</td>
+                    <td>Southbridge to CPU communication error. Failing Southbridge chip or a severed pad on the FSB.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0031</span></td>
+                    <td><span class="sys-tag">RAM</span></td>
+                    <td>All</td>
+                    <td>RAM short circuit. A memory chip is damaged or bridged.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0032</span></td>
+                    <td><span class="sys-tag">CPU / RAM</span></td>
+                    <td>Xenon, Zephyr</td>
+                    <td>CPU to RAM comms failure. Board warping likely snapped microscopic traces under the CPU.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0033</span></td>
+                    <td><span class="sys-tag">RAM</span></td>
+                    <td>Phats</td>
+                    <td>RAM configuration error. Solder joints under a RAM module have failed. Requires RAM reball.</td>
+                </tr>
+
+                <!-- 01xx -->
+                <tr>
+                    <td><span class="error-code">0100</span></td>
+                    <td><span class="sys-tag">GPU / RAM</span></td>
+                    <td>Xenon, Zephyr</td>
+                    <td>Cold solder joint under RAM or GPU. Common on consoles stored in damp environments.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0101</span></td>
+                    <td><span class="sys-tag">USB / SB</span></td>
+                    <td>Corona, Trinity</td>
+                    <td>Short on USB ports or dead Southbridge. Inspect front/rear USB ports for bent pins. If clear, the SB chip is dead (common on Coronas).</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0102</span></td>
+                    <td><span class="sys-tag">GPU</span></td>
+                    <td>Xenon, Falcon</td>
+                    <td><strong>The Classic RROD.</strong> Low-TG underfill beneath the GPU chip failed, breaking solder bumps inside the chip. The towel trick is a lie. Requires a GPU replacement.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0103</span></td>
+                    <td><span class="sys-tag">GPU</span></td>
+                    <td>Zephyr, Falcon</td>
+                    <td>CPU to GPU comms error. Structurally identical to 0102; the GPU die underfill has failed.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">0110</span></td>
+                    <td><span class="sys-tag">RAM</span></td>
+                    <td>All</td>
+                    <td>Memory error. The GPU cannot communicate with the RAM. Dead RAM chip or cracked solder pad under a module.</td>
+                </tr>
+
+                <!-- 02xx & 10xx -->
+                <tr>
+                    <td><span class="error-code">0203</span></td>
+                    <td><span class="sys-tag">Thermal</span></td>
+                    <td>Phats</td>
+                    <td>System control thermal failure. Tied to cracked joints under the GPU from severe board warping.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">1001</span></td>
+                    <td><span class="sys-tag">DVD</span></td>
+                    <td>All</td>
+                    <td>DVD Drive receiving improper voltage, or firmware on the PCB is bricked.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">1003</span></td>
+                    <td><span class="sys-tag">HDD</span></td>
+                    <td>All</td>
+                    <td>Hard Drive short. Remove HDD and boot. If it works, the HDD enclosure or drive is fried.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">1010</span></td>
+                    <td><span class="sys-tag">HDD</span></td>
+                    <td>All</td>
+                    <td>Secondary for E68. eFUSE mismatch or HDD error. Pull the hard drive.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">1013</span></td>
+                    <td><span class="sys-tag">Dashboard</span></td>
+                    <td>All</td>
+                    <td>Corrupt dashboard update. Console failed halfway through flashing. Put the dashboard update on a FAT32 USB and try booting.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">1022</span></td>
+                    <td><span class="sys-tag">HANA / GPU</span></td>
+                    <td>Zephyr, Falcon</td>
+                    <td>Secondary for E74. Faulty AV cable (pulling on port), dead HANA chip, or broken traces between GPU and HANA. Usually a dying GPU.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code">1033</span></td>
+                    <td><span class="sys-tag">CPU</span></td>
+                    <td>Jasper, Trinity</td>
+                    <td>Fatal CPU initialization failure. Dead CPU. Unrepairable without a donor chip and matching NAND dump.</td>
+                </tr>
+
+                <!-- Primary E-Codes -->
+                <tr>
+                    <td><span class="error-code e-code">E64 / E65</span></td>
+                    <td><span class="sys-tag">DVD FW</span></td>
+                    <td>All</td>
+                    <td>DVD Drive Firmware error. Dashboard detects drive, but firmware OSKV doesn't match (usually a bad flashed firmware attempt).</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code e-code">E66</span></td>
+                    <td><span class="sys-tag">DVD Model</span></td>
+                    <td>All</td>
+                    <td>DVD Drive spoofing failed. Dashboard expects a Lite-On but detects a BenQ (or similar mismatch).</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code e-code">E68</span></td>
+                    <td><span class="sys-tag">HDD</span></td>
+                    <td>All</td>
+                    <td>Hard Drive error. Secondary code 1010. Remove HDD.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code e-code">E71 / E79</span></td>
+                    <td><span class="sys-tag">NAND</span></td>
+                    <td>All</td>
+                    <td>Dashboard corruption. Hold sync while booting to clear cache. If persistent, internal NAND blocks might be failing.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code e-code">E73</span></td>
+                    <td><span class="sys-tag">HANA / Eth</span></td>
+                    <td>Zephyr, Falcon</td>
+                    <td>Ethernet port or HANA chip hardware failure. Inspect ethernet pins. Otherwise, HANA needs reflow/replacement.</td>
+                </tr>
+                <tr>
+                    <td><span class="error-code e-code">E74</span></td>
+                    <td><span class="sys-tag">GPU</span></td>
+                    <td>Falcon</td>
+                    <td>Secondary code 1022. Breakdown of comms between GPU and HANA chip. Almost always a dying GPU requiring replacement.</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+
+<script>
+    // Classic simple filter script
+    document.getElementById('searchBox').addEventListener('keyup', function() {
+        var filter = this.value.toUpperCase();
+        var rows = document.querySelectorAll('#dataTable tbody tr');
+        
+        for (var i = 0; i < rows.length; i++) {
+            var rowText = rows[i].textContent || rows[i].innerText;
+            if (rowText.toUpperCase().indexOf(filter) > -1) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    });
+</script>
+
 </body>
 </html>
