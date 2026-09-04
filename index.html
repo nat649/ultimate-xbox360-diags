@@ -217,11 +217,25 @@
   <!-- ================= TAB: BOARDS ================= -->
   <section v-show="tab==='boards'" class="p-5 sm:p-7">
     <h2 class="sect">Motherboard revisions</h2>
-    <p class="text-[13px] mb-3" style="color:var(--dim)">Ten revisions over nine years. Tier badges come from the reliability ranking; modding notes cover JTAG/RGH compatibility.</p>
+    <p class="text-[13px] mb-3" style="color:var(--dim)">Ten revisions over nine years. Most can be identified without opening the console &mdash; the manufacture date on the rear sticker, whether there is an HDMI port, and the wattage printed on the power brick narrow it to one or two revisions.</p>
     <div class="flex flex-wrap gap-1.5 mb-4">
       <button v-for="f in [['','All'],['safe','Safe to buy (S+/S/A)'],['risky','Risky (B/C/F)'],['glitch','RGH/JTAG capable']]" :key="f[0]"
               @click="boardFilter=f[0]" :data-on="boardFilter===f[0]?'1':'0'"
               class="chip label px-2 py-1 rounded cursor-pointer">{{ f[1] }}</button>
+    </div>
+
+    <div class="panel rounded p-4 mb-4" v-if="DB.psuConnectors">
+      <h3 class="label mb-1" style="color:var(--acc)">Power brick by generation</h3>
+      <p class="text-[12.5px] mb-3" style="color:var(--dim)">The wattage printed on the brick is the quickest way to place a phat, and the connectors are keyed so the generations do not mix.</p>
+      <div class="grid sm:grid-cols-3 gap-3">
+        <div v-for="c in DB.psuConnectors" :key="c.watts" class="text-center">
+          <div class="text-[22px] font-semibold acc">{{ c.watts }}</div>
+          <div class="mono text-[11px]" style="color:var(--dim)">{{ c.amps }}</div>
+          <div class="text-[12.5px] font-medium mt-1">{{ c.boards }}</div>
+          <div class="text-[11.5px] mt-1" style="color:var(--dim)">{{ c.note }}</div>
+        </div>
+      </div>
+      <p class="text-[11.5px] mt-3 pt-3" style="color:var(--dim);border-top:1px solid var(--line-2)">{{ DB.psuNote }}</p>
     </div>
     <div class="grid md:grid-cols-2 gap-3">
       <article v-for="m in boards" :key="m.name" class="panel rounded p-4 relative">
@@ -242,6 +256,9 @@
           </template>
         </dl>
         <p class="text-[13px] m-0 pt-2" style="border-top:1px solid var(--line)">{{ m.desc }}</p>
+        <div v-if="m.ident" class="mt-2 text-[12px]">
+          <span class="label" style="color:var(--acc)">How to spot it &nbsp;</span>{{ m.ident }}
+        </div>
         <div v-if="m.faults" class="mt-2 text-[12px]">
           <span class="label" style="color:var(--dim)">Fails first &nbsp;</span>{{ m.faults }}
         </div>
@@ -390,6 +407,10 @@
       <article v-for="e in editions" :key="e.name" class="panel rounded p-3">
         <h3 class="text-[14px] font-semibold text-white m-0">{{ e.name }}</h3>
         <div class="label mb-1.5" style="color:var(--dim)">{{ e.year }} · {{ e.chassis }}</div>
+        <div v-if="e.board" class="flex items-baseline gap-1.5 mb-1.5">
+          <span class="label shrink-0" style="color:var(--acc)">Likely board</span>
+          <span class="text-[12px]">{{ e.board }}</span>
+        </div>
         <p class="text-[12px] m-0">{{ e.notes }}</p>
       </article>
     </div>

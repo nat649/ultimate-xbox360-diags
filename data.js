@@ -305,12 +305,12 @@ window.DIAGS = {
    "code": "1013",
    "sys": "Dashboard",
    "boards": "All",
-   "fix": "Corrupt dashboard update. Console failed halfway through flashing. Put the dashboard update on a FAT32 USB and try booting.",
+   "fix": "Usually a default.xex left in the root of an attached USB stick - unplug it and boot again before assuming anything is wrong. Otherwise a dashboard update that died part way through flashing.",
    "severity": "moderate",
    "difficulty": "DIY",
-   "detail": "Dashboard update died part way through flashing. Put the full update on a FAT32 USB stick and boot with it attached. If the console will not take the update at all, the NAND blocks it writes to are failing.",
+   "detail": "Verified on Falcon, Trinity and Corona: leave a USB stick with a default.xex in its root plugged in and the console throws this on the next boot. Nothing is wrong with it - pull the stick, or move the payload into a subfolder. Only if it persists with nothing attached is it a genuine half-flashed dashboard update, in which case put the full update on a FAT32 stick and boot with it attached; if it will not take the update at all, the NAND blocks it writes to are failing.",
    "related": [
-    "E71 / E79",
+    "E71",
     "0022"
    ]
   },
@@ -381,7 +381,7 @@ window.DIAGS = {
    ]
   },
   {
-   "code": "E71 / E79",
+   "code": "E71",
    "sys": "NAND",
    "boards": "All",
    "fix": "Dashboard corruption. Hold sync while booting to clear cache. If persistent, internal NAND blocks might be failing. Or a stray default.xex at the root of your USB is being picked up (shows E71 on screen).",
@@ -445,6 +445,7 @@ window.DIAGS = {
     "0100",
     "0020"
    ],
+   "ident": "No HDMI port and a 203W (16.5A) brick. Everything from launch to mid-2006. If it has HDMI it is not a Xenon.",
    "compat": {
     "jtag": "Yes - kernel 2.0.7371 or lower",
     "rgh": "RGH1 (best on Xenon)",
@@ -476,6 +477,7 @@ window.DIAGS = {
     "0102",
     "E73"
    ],
+   "ident": "HDMI plus a 203W (16.5A) brick - that pairing is Zephyr and nothing else. Dated late 2006 to mid-2007.",
    "compat": {
     "jtag": "Yes - 7371 or lower",
     "rgh": "RGH2",
@@ -506,6 +508,7 @@ window.DIAGS = {
     "1022",
     "0102"
    ],
+   "ident": "HDMI with a 175W (14.2A) brick, made late 2007 to around mid-2008. The date on the rear sticker is what separates it from the v2.",
    "compat": {
     "jtag": "Yes - 7371 or lower",
     "rgh": "RGH2",
@@ -535,6 +538,7 @@ window.DIAGS = {
     "0011",
     "1001"
    ],
+   "ident": "Externally identical to an early Falcon - same brick, same ports. Only the manufacture date tells them apart: mid to late 2008. Opened up, the GPU die is visibly smaller than the 90nm part.",
    "compat": {
     "jtag": "Yes - 7371 or lower",
     "rgh": "RGH2",
@@ -564,6 +568,7 @@ window.DIAGS = {
     "0011",
     "0021"
    ],
+   "ident": "A 175W (14.2A) brick with no HDMI port. Nothing else ships that combination, so it is unmistakable from the back panel alone.",
    "compat": {
     "jtag": "Yes - 7371 or lower",
     "rgh": "RGH2",
@@ -594,6 +599,7 @@ window.DIAGS = {
     "1033",
     "1001"
    ],
+   "ident": "HDMI with a 150W (12.1A) brick, late 2008 onward. Arcade units report 256 MB or 512 MB of internal storage in the dashboard storage settings.",
    "compat": {
     "jtag": "Yes - 7371 or lower (the JTAG board to want)",
     "rgh": "RGH2",
@@ -623,6 +629,7 @@ window.DIAGS = {
     "1001",
     "1003"
    ],
+   "ident": "Same 150W brick and the same ports as a Jasper - the manufacture date is the only outside tell, late 2009 into 2010.",
    "compat": {
     "jtag": "Rare - most shipped past 7371",
     "rgh": "RGH2",
@@ -652,6 +659,7 @@ window.DIAGS = {
     "0101",
     "0022"
    ],
+   "ident": "The glossy Xbox 360 S chassis with the touch-sensitive power button, made 2010 into 2011. Every early S is a Trinity; from late 2011 they start being Corona.",
    "compat": {
     "jtag": "No",
     "rgh": "RGH1.2 / RGH2",
@@ -681,6 +689,7 @@ window.DIAGS = {
     "0022",
     "1033"
    ],
+   "ident": "An S from late 2011 on, any E before the Winchester run, or anything with 4 GB of soldered eMMC. Corona folded the HANA into the Southbridge, so opened up there is no separate scaler chip beside the CGPU.",
    "compat": {
     "jtag": "No",
     "rgh": "RGH3 (V1-V5) / V6 needs the eMMC method",
@@ -709,6 +718,7 @@ window.DIAGS = {
     "1003",
     "1001"
    ],
+   "ident": "An Xbox 360 E made from 2014 on. Opened up it is unmistakable: the CGPU has no metal heat spreader, just bare silicon under the heatsink.",
    "compat": {
     "jtag": "No",
     "rgh": "None - no public glitch exists",
@@ -949,91 +959,106 @@ window.DIAGS = {
    "name": "Halo 3 Special Edition",
    "year": "2007",
    "chassis": "Phat",
-   "notes": "\"Spartan\" green & gold shell, matching controller, Halo boot chime. 20 GB HDD. The first limited 360."
+   "notes": "\"Spartan\" green & gold shell, matching controller, Halo boot chime. 20 GB HDD. The first limited 360.",
+   "board": "Zephyr - late stock may be an early Falcon"
   },
   {
    "name": "The Simpsons Movie",
    "year": "2007",
    "chassis": "Phat",
-   "notes": "Contest-only yellow console with Simpsons cloud faceplate. Roughly 100 made — one of the rarest 360s."
+   "notes": "Contest-only yellow console with Simpsons cloud faceplate. Roughly 100 made — one of the rarest 360s.",
+   "board": "Zephyr"
   },
   {
    "name": "Resident Evil 5",
    "year": "2009",
    "chassis": "Phat",
-   "notes": "Japan/US Elite in custom red with RE5 artwork, red controller. 120 GB."
+   "notes": "Japan/US Elite in custom red with RE5 artwork, red controller. 120 GB.",
+   "board": "Jasper"
   },
   {
    "name": "Modern Warfare 2",
    "year": "2009",
    "chassis": "Phat",
-   "notes": "Dark grey/olive Elite with laser-etched MW2 logo, red ring of light, custom boot. 250 GB."
+   "notes": "Dark grey/olive Elite with laser-etched MW2 logo, red ring of light, custom boot. 250 GB.",
+   "board": "Jasper"
   },
   {
    "name": "Final Fantasy XIII (Lightning Edition)",
    "year": "2009",
    "chassis": "Phat",
-   "notes": "Japan-only pearl-white Elite with airbrushed Lightning art, white controller. 250 GB."
+   "notes": "Japan-only pearl-white Elite with airbrushed Lightning art, white controller. 250 GB.",
+   "board": "Jasper, late units Tonasket"
   },
   {
    "name": "Special Edition Blue",
    "year": "2010",
    "chassis": "Phat",
-   "notes": "Translucent blue Elite shell + blue controller, first sold in the \"Family Bundle\". Also Japan retail."
+   "notes": "Translucent blue Elite shell + blue controller, first sold in the \"Family Bundle\". Also Japan retail.",
+   "board": "Jasper or Tonasket (Kronos)"
   },
   {
    "name": "Halo: Reach",
    "year": "2010",
    "chassis": "Slim (S)",
-   "notes": "Silver/black UNSC etching, matching controllers, Reach boot animation + sounds. 250 GB. First limited Slim."
+   "notes": "Silver/black UNSC etching, matching controllers, Reach boot animation + sounds. 250 GB. First limited Slim.",
+   "board": "Trinity"
   },
   {
    "name": "Kinect Star Wars (R2-D2 / C-3PO)",
    "year": "2012",
    "chassis": "Slim (S)",
-   "notes": "R2-D2-painted console with astromech beeps for the power/eject tones, gold C-3PO controller, white Kinect. 320 GB."
+   "notes": "R2-D2-painted console with astromech beeps for the power/eject tones, gold C-3PO controller, white Kinect. 320 GB.",
+   "board": "Corona"
   },
   {
    "name": "Gears of War 3",
    "year": "2011",
    "chassis": "Slim (S)",
-   "notes": "Weathered red/brown \"Crimson Omen\" shell, custom controller, Gears boot sounds. 320 GB."
+   "notes": "Weathered red/brown \"Crimson Omen\" shell, custom controller, Gears boot sounds. 320 GB.",
+   "board": "Trinity"
   },
   {
    "name": "Star Wars: The Old Republic / Battlefield 3",
    "year": "2011",
    "chassis": "Slim (S)",
-   "notes": "Bundle consoles with themed sleeves and decals but standard black hardware underneath."
+   "notes": "Bundle consoles with themed sleeves and decals but standard black hardware underneath.",
+   "board": "Trinity"
   },
   {
    "name": "Call of Duty: Modern Warfare 3 Limited Edition",
    "year": "2011",
    "chassis": "Slim (S)",
-   "notes": "320 GB Xbox 360 S in a custom dark finish with MW3 branding, shipped with two matching wireless controllers and a wired headset. Notable for replacing the console’s own power-on and eject sounds with MW3 audio — one of the very few bundles that changed the hardware’s UI sounds rather than just its paint."
+   "notes": "320 GB Xbox 360 S in a custom dark finish with MW3 branding, shipped with two matching wireless controllers and a wired headset. Notable for replacing the console’s own power-on and eject sounds with MW3 audio — one of the very few bundles that changed the hardware’s UI sounds rather than just its paint.",
+   "board": "Trinity - late stock may be Corona"
   },
   {
    "name": "Halo 4",
    "year": "2012",
    "chassis": "Slim (S)",
-   "notes": "Blue-accented grey shell, \"Forward Unto Dawn\" laser etching, blue controllers, custom boot + sounds. 320 GB."
+   "notes": "Blue-accented grey shell, \"Forward Unto Dawn\" laser etching, blue controllers, custom boot + sounds. 320 GB.",
+   "board": "Corona"
   },
   {
    "name": "Chrome Series (Red / Blue / Silver)",
    "year": "2012 - 2013",
    "chassis": "Slim (S)",
-   "notes": "Region-limited mirror-chrome side panels over the glossy 320 GB Slim."
+   "notes": "Region-limited mirror-chrome side panels over the glossy 320 GB Slim.",
+   "board": "Corona"
   },
   {
    "name": "GTA V",
    "year": "2013",
    "chassis": "Slim (S)",
-   "notes": "Blue-accented 500 GB Slim with GTA V branding, custom controller, unique boot. Last major limited 360."
+   "notes": "Blue-accented 500 GB Slim with GTA V branding, custom controller, unique boot. Last major limited 360.",
+   "board": "Corona"
   },
   {
    "name": "Forza Horizon 2 / Sunset Overdrive era",
    "year": "2014 - 2015",
    "chassis": "E",
-   "notes": "Late 500 GB E bundles — decals and packaging only, no shell restyle."
+   "notes": "Late 500 GB E bundles — decals and packaging only, no shell restyle.",
+   "board": "Winchester"
   }
  ],
  "softmods": {
@@ -1084,5 +1109,26 @@ window.DIAGS = {
    ],
    "link": "https://free60.org/Hacks/Bad_Update_Hack/"
   }
- }
+ },
+ "psuConnectors": [
+  {
+   "watts": "203W",
+   "amps": "12V / 16.5A",
+   "boards": "Xenon, Zephyr",
+   "note": "The launch brick, and the only one those two boards accept."
+  },
+  {
+   "watts": "175W",
+   "amps": "12V / 14.2A",
+   "boards": "Opus, Early and Late Falcon",
+   "note": "Arrived with the 65nm CPU, and reused for the Opus warranty boards."
+  },
+  {
+   "watts": "150W",
+   "amps": "12V / 12.1A",
+   "boards": "Jasper, Tonasket (Kronos)",
+   "note": "The final phat brick, from the 65nm GPU shrink onward."
+  }
+ ],
+ "psuNote": "The three phat generations use differently keyed connectors and are not freely interchangeable - match the wattage printed on the brick to the board rather than assuming a plug that physically enters is the right one. Slim and E consoles use a smaller connector of their own, so there is no crossover with the phats at all."
 };
