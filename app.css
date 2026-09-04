@@ -1,0 +1,163 @@
+/* ===== 360 Diagnostic Wiki — dark UI theme =====
+   Monospace is reserved for data (codes, specs); everything else is Inter.
+   Surfaces are soft and layered rather than hard-ruled. ===== */
+
+:root{
+  --bg:#0f1216; --bg-2:#151a1f;
+  --panel:rgba(255,255,255,.038); --panel-2:rgba(255,255,255,.065);
+  --line:rgba(255,255,255,.085); --line-2:rgba(255,255,255,.05);
+  --txt:#d6dcdf; --dim:#8d979d; --hi:#ffffff;
+  --acc:#7fc45a; --acc-2:#a8dd88; --acc-soft:rgba(127,196,90,.15); --acc-dim:rgba(127,196,90,.32);
+  --red:#f2604f; --amber:#f0ad3c; --blue:#5cb0e8;
+  --font-mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 8px 24px -12px rgba(0,0,0,.65);
+}
+[data-phosphor="amber"]{ --acc:#e8a93f; --acc-2:#f7cd80; --acc-soft:rgba(232,169,63,.15); --acc-dim:rgba(232,169,63,.32); }
+[data-phosphor="ice"]{ --acc:#57b3e6; --acc-2:#94d5f5; --acc-soft:rgba(87,179,230,.15); --acc-dim:rgba(87,179,230,.32); }
+[data-phosphor="magenta"]{ --acc:#e069c4; --acc-2:#f3a6df; --acc-soft:rgba(224,105,196,.15); --acc-dim:rgba(224,105,196,.32); }
+
+*{scrollbar-color:rgba(255,255,255,.16) transparent}
+::-webkit-scrollbar{width:9px;height:9px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,.14);border-radius:8px}
+::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,.22)}
+::-webkit-scrollbar-track{background:transparent}
+html{scroll-behavior:smooth}
+
+body{
+  background:#0d1013;
+  color:var(--txt);
+  font-family:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:14.5px; line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+  letter-spacing:-0.002em;
+}
+body::before{
+  content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+  background:
+    radial-gradient(1100px 620px at 50% -12%, #1b2228 0%, transparent 62%),
+    linear-gradient(180deg,#101418,#0d1013);
+}
+
+/* the CRT look is opt-in now, and much gentler than it was */
+body[data-scanlines="on"]::after{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:60;
+  background:repeating-linear-gradient(180deg,rgba(0,0,0,.13) 0 1px,transparent 1px 3px);
+}
+
+.mono{font-family:var(--font-mono);font-feature-settings:"tnum" 1}
+.acc{color:var(--acc)}
+.glow{text-shadow:none}
+
+/* ---------- shell ---------- */
+#app.shell{
+  background:linear-gradient(180deg,rgba(255,255,255,.02),transparent 220px);
+  border-left:1px solid var(--line-2); border-right:1px solid var(--line-2);
+  box-shadow:0 0 90px rgba(0,0,0,.45);
+}
+#app .hdr{
+  background:linear-gradient(180deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  border-bottom:1px solid var(--line);
+}
+#app .navbar{
+  background:rgba(16,20,24,.96);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--line);
+}
+
+/* ---------- surfaces ---------- */
+#app .panel{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:var(--shadow);
+}
+#app .panel:where(article):hover{border-color:rgba(255,255,255,.15)}
+article.panel{transition:border-color .18s ease, transform .18s ease}
+
+/* ---------- section headings ---------- */
+.sect{
+  font-family:"Inter",system-ui,sans-serif;
+  font-size:18px; font-weight:600; letter-spacing:-0.015em; text-transform:none;
+  color:var(--hi); border-bottom:1px solid var(--line-2);
+  padding-bottom:9px; margin:0 0 16px;
+}
+.label{
+  font-size:11px; font-weight:600; letter-spacing:.02em; text-transform:none;
+  font-family:"Inter",system-ui,sans-serif;
+}
+
+/* ---------- chips / tags ---------- */
+#app .chip{
+  border:1px solid var(--line); background:var(--panel-2); color:var(--dim);
+  border-radius:999px; transition:all .16s ease;
+}
+#app .chip:hover{border-color:rgba(255,255,255,.2);color:var(--txt)}
+#app .chip[data-on="1"]{
+  border-color:var(--acc-dim); color:var(--acc-2); background:var(--acc-soft);
+}
+kbd.chip{border-radius:6px}
+
+/* ---------- tabs ---------- */
+.tab{
+  position:relative; border-bottom:2px solid transparent; color:var(--dim);
+  transition:color .16s ease, background .16s ease;
+}
+.tab:hover{color:var(--hi);background:rgba(255,255,255,.04)}
+.tab[data-on="1"]{color:var(--acc-2);border-bottom-color:var(--acc);background:rgba(255,255,255,.045)}
+
+mark{background:var(--acc-soft);color:var(--acc-2);border-radius:3px;padding:0 3px}
+
+/* ---------- code pill ---------- */
+#app .code-pill{
+  font-family:var(--font-mono); font-weight:600; letter-spacing:.04em;
+  color:var(--acc-2); background:var(--acc-soft);
+  border:1px solid var(--acc-dim); border-radius:7px; padding:3px 9px; display:inline-block;
+}
+
+/* ---------- tier badges ---------- */
+.tier-S\+{--t:#f4776a}.tier-S{--t:#f0a355}.tier-A{--t:#ecd15f}.tier-B{--t:#9fd775}.tier-C{--t:#6cb6e8}.tier-F{--t:#98a2a8}
+#app .tierbox{
+  display:inline-grid; place-items:center; line-height:1;
+  background:var(--t,#98a2a8); color:#101408;
+  font-weight:800; letter-spacing:.01em; border-radius:7px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35), 0 1px 3px rgba(0,0,0,.35);
+}
+#app .tierbox.tierrail{border-radius:0;align-self:stretch;box-shadow:inset -1px 0 0 rgba(0,0,0,.25)}
+
+/* ---------- ring of light ---------- */
+.ring-q{transition:fill .18s ease, filter .18s ease;cursor:pointer}
+.ring-q.on{fill:var(--red);filter:drop-shadow(0 0 7px rgba(242,96,79,.55))}
+.ring-q.off{fill:rgba(255,255,255,.07)}
+.ring-q.static{cursor:default}
+.ring-q:not(.static):hover{filter:brightness(1.45)}
+
+/* ---------- tables ---------- */
+table{border-collapse:separate;border-spacing:0;width:100%}
+th{
+  position:sticky;top:0;z-index:2;text-align:left;
+  background:#161b1f;
+  font-family:"Inter",system-ui,sans-serif; font-size:11.5px; font-weight:600;
+  letter-spacing:.01em; text-transform:none; color:var(--dim);
+  border-bottom:1px solid var(--line); padding:11px 13px; white-space:nowrap;
+}
+td{border-bottom:1px solid var(--line-2);padding:11px 13px;vertical-align:top}
+tbody tr{transition:background .14s ease}
+tbody tr:hover{background:rgba(255,255,255,.032)}
+tbody tr:last-child td{border-bottom:0}
+
+/* ---------- form controls ---------- */
+#app input{
+  background:rgba(0,0,0,.28); border:1px solid var(--line); border-radius:9px;
+  transition:border-color .16s ease, box-shadow .16s ease;
+}
+#app input::placeholder{color:rgba(255,255,255,.32)}
+#app input:focus{
+  outline:none; border-color:var(--acc-dim);
+  box-shadow:0 0 0 3px var(--acc-soft);
+}
+button:focus-visible{outline:2px solid var(--acc-dim);outline-offset:2px;border-radius:8px}
+button{transition:all .16s ease}
+
+.fade-enter-active,.fade-leave-active{transition:opacity .18s}
+.fade-enter-from,.fade-leave-to{opacity:0}
+@media print{ body::after{display:none} .noprint{display:none!important} }

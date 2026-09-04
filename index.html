@@ -1,1169 +1,408 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-phosphor="green">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Xbox 360 hardware reference: motherboard revisions, reliability ranking, and secondary error codes.">
-    <title>360 Diagnostic Wiki - Motherboards & Error Codes</title>
-    <style>
-        /* Classic Forum / Scene Aesthetic */
-        :root {
-            --bg-color: #0d0d0d;
-            --panel-bg: #1a1a1a;
-            --border-color: #333333;
-            --text-main: #cccccc;
-            --text-light: #ffffff;
-            --xbox-green: #65b042;
-            --xbox-green-dark: #3a6b24;
-            --alert-red: #ff3333;
-            --alert-bg: #330000;
-            --muted: #8a8a8a;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            background-image: linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-            background-size: 20px 20px;
-            color: var(--text-main);
-            font-family: Tahoma, Verdana, Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
-            margin: 0;
-            padding: 0 0 50px 0;
-        }
-
-        #wrapper {
-            max-width: 1100px;
-            margin: 0 auto;
-            border-left: 1px solid var(--border-color);
-            border-right: 1px solid var(--border-color);
-            background-color: #111111;
-            min-height: 100vh;
-        }
-
-        /* Header / Banner */
-        header {
-            background-color: #000;
-            border-bottom: 3px solid var(--xbox-green);
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        header h1 {
-            color: var(--xbox-green);
-            font-family: "Courier New", Courier, monospace;
-            font-size: 28px;
-            font-weight: bold;
-            margin: 0;
-            text-transform: uppercase;
-        }
-
-        header .subtitle {
-            color: var(--muted);
-            font-size: 12px;
-        }
-
-        /* Tab navigation */
-        .tab-nav {
-            display: flex;
-            flex-wrap: wrap;
-            background-color: #000;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .tab-nav button {
-            background: transparent;
-            border: none;
-            border-right: 1px solid var(--border-color);
-            border-bottom: 3px solid transparent;
-            color: var(--muted);
-            font-family: "Courier New", Courier, monospace;
-            font-size: 13px;
-            font-weight: bold;
-            text-transform: uppercase;
-            padding: 12px 18px;
-            cursor: pointer;
-        }
-
-        .tab-nav button:hover { color: var(--text-light); }
-
-        .tab-nav button.active {
-            color: var(--xbox-green);
-            border-bottom-color: var(--xbox-green);
-            background-color: #0a0a0a;
-        }
-
-        .tab-panel { display: none; }
-        .tab-panel.active { display: block; }
-
-        .content-section {
-            padding: 20px;
-        }
-
-        h2 {
-            color: var(--text-light);
-            font-size: 18px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 5px;
-            margin-top: 30px;
-            margin-bottom: 15px;
-            text-transform: uppercase;
-        }
-
-        h2:first-child { margin-top: 0; }
-
-        /* Warning / Info Box */
-        .sticky-post {
-            background-color: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            border-left: 4px solid var(--xbox-green);
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-
-        .sticky-post.warn { border-left-color: var(--alert-red); }
-
-        .sticky-post h3 {
-            margin: 0 0 10px 0;
-            color: var(--text-light);
-            font-size: 15px;
-        }
-
-        .code-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-            background-color: #000;
-            padding: 10px;
-            border: 1px solid #222;
-        }
-
-        .code-grid div {
-            font-family: "Courier New", Courier, monospace;
-            color: #999;
-        }
-        .code-grid span { color: var(--alert-red); font-weight: bold; }
-
-        /* Motherboard Grid */
-        .mobo-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-
-        @media (max-width: 768px) {
-            .mobo-container { grid-template-columns: 1fr; }
-        }
-
-        .mobo-box {
-            background-color: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            padding: 15px;
-        }
-
-        .mobo-box h4 {
-            margin: 0 0 10px 0;
-            color: var(--xbox-green);
-            font-size: 16px;
-            border-bottom: 1px dotted #444;
-            padding-bottom: 5px;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .mobo-box .year {
-            color: #666;
-            font-size: 12px;
-        }
-
-        .mobo-box.highlight {
-            border-color: var(--xbox-green-dark);
-            background-color: #141f10;
-        }
-
-        .mobo-stats {
-            list-style: none;
-            padding: 0;
-            margin: 0 0 10px 0;
-        }
-
-        .mobo-stats li {
-            margin-bottom: 5px;
-            font-size: 13px;
-        }
-
-        .mobo-stats strong {
-            color: var(--text-light);
-        }
-
-        .mobo-desc {
-            font-size: 12px;
-            color: #aaa;
-            border-top: 1px solid #222;
-            padding-top: 10px;
-        }
-
-
-        /* Tier list */
-        .tier-row {
-            display: flex;
-            align-items: stretch;
-            margin-bottom: 6px;
-            border: 1px solid var(--border-color);
-            background-color: var(--panel-bg);
-        }
-
-        .tier-label {
-            flex: 0 0 60px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: "Courier New", Courier, monospace;
-            font-size: 22px;
-            font-weight: bold;
-            color: #000;
-        }
-
-        .tier-s  { background-color: #ff7f7f; }
-        .tier-sp { background-color: #ffbf7f; }
-        .tier-a  { background-color: #ffdf7f; }
-        .tier-b  { background-color: #ffff7f; }
-        .tier-c  { background-color: #bfff7f; }
-        .tier-f  { background-color: #7f7f7f; }
-
-        .tier-items {
-            flex: 1;
-            padding: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .tier-chip {
-            background-color: #000;
-            border: 1px solid #333;
-            padding: 4px 8px;
-            font-size: 12px;
-            color: var(--text-light);
-            font-family: "Courier New", Courier, monospace;
-        }
-
-        .rank-note { font-size: 12px; color: var(--muted); margin-top: 4px; }
-
-        /* Database Table */
-        .search-bar {
-            background-color: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            margin-bottom: 15px;
-        }
-
-        .search-bar label {
-            display: block;
-            font-size: 11px;
-            text-transform: uppercase;
-            color: var(--muted);
-            margin-bottom: 5px;
-        }
-
-        #searchBox {
-            width: 100%;
-            box-sizing: border-box;
-            background-color: #000;
-            border: 1px solid #444;
-            color: var(--xbox-green);
-            padding: 8px;
-            font-family: Tahoma, sans-serif;
-            font-size: 14px;
-        }
-
-        #searchBox:focus {
-            outline: none;
-            border-color: var(--xbox-green);
-        }
-
-        .table-scroll { overflow-x: auto; }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 13px;
-            min-width: 640px;
-        }
-
-        th, td {
-            border: 1px solid var(--border-color);
-            padding: 10px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #222;
-            color: var(--text-light);
-            font-weight: bold;
-        }
-
-        tr:nth-child(even) {
-            background-color: #161616;
-        }
-
-        tr:hover {
-            background-color: #2a2a2a;
-        }
-
-        .no-results td {
-            text-align: center;
-            color: var(--muted);
-            font-style: italic;
-        }
-
-        .error-code {
-            font-family: "Courier New", Courier, monospace;
-            font-weight: bold;
-            color: var(--text-light);
-            background-color: #000;
-            padding: 3px 6px;
-            border: 1px solid #333;
-        }
-
-        .e-code { color: #ff9900; }
-
-        .sys-tag {
-            font-size: 11px;
-            background-color: #333;
-            color: #ccc;
-            padding: 2px 5px;
-            margin-right: 4px;
-            display: inline-block;
-        }
-
-        .col-w1 { width: 15%; }
-        .col-w2 { width: 15%; }
-        .col-w3 { width: 20%; }
-        .col-w4 { width: 50%; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Xbox 360 hardware reference: interactive RROD secondary error code decoder, motherboard revisions, reliability tier list, modding compatibility and every retail model.">
+<meta name="theme-color" content="#08090a">
+<title>360 Diagnostic Wiki - RROD Decoder, Motherboards &amp; Error Codes</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%2365b042' stroke-width='5'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config={corePlugins:{preflight:false}}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.27/vue.global.prod.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/7.0.0/fuse.min.js"></script>
+<script src="data.js"></script>
+<style>[v-cloak]{display:none}</style>
 </head>
-<body>
+<body data-scanlines="off">
+<div id="app" v-cloak class="shell max-w-[1180px] mx-auto min-h-screen">
 
-<div id="wrapper">
-    <header>
-        <div>
-            <h1>the "ultimate" xbox 360 diags</h1>
-            <div class="subtitle">Index // Models, Hardware Revisions, Reliability Ranking &amp; Secondary Error Codes</div>
+  <!-- ================= HEADER ================= -->
+  <header class="hdr px-5 sm:px-7 py-5 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <svg width="40" height="40" viewBox="0 0 40 40" class="shrink-0" aria-hidden="true">
+        <circle cx="20" cy="20" r="15" fill="none" stroke="var(--acc)" stroke-width="2" opacity=".3"></circle>
+        <circle cx="20" cy="20" r="15" fill="none" stroke="var(--acc)" stroke-width="4" stroke-dasharray="18 76" stroke-linecap="round" transform="rotate(-90 20 20)"></circle>
+        <circle cx="20" cy="20" r="5" fill="var(--acc)" opacity=".85"></circle>
+      </svg>
+      <div>
+        <h1 class="text-[21px] sm:text-[26px] font-semibold acc leading-tight m-0 tracking-[-0.02em]">The &ldquo;ultimate&rdquo; Xbox&nbsp;360 diags</h1>
+        <div class="text-[12.5px] mt-0.5" style="color:var(--dim)">RROD decoder, error codes, motherboards, softmods and every model</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2 noprint">
+      <button v-for="p in phosphors" :key="p.id" @click="setPhosphor(p.id)"
+        class="w-5 h-5 rounded-full cursor-pointer"
+        :style="{background:p.c, border:'1px solid '+(phosphor===p.id?'#fff':'transparent'), boxShadow: phosphor===p.id ? '0 0 8px '+p.c : 'none'}"
+        :title="'Phosphor: '+p.id" :aria-label="'Phosphor '+p.id"></button>
+      <button @click="toggleScan" class="chip label px-2 py-1 rounded cursor-pointer" :data-on="scan?'1':'0'" title="Toggle CRT scanlines">CRT</button>
+    </div>
+  </header>
+
+  <!-- ================= TABS ================= -->
+  <nav class="navbar flex flex-wrap sticky top-0 z-40 noprint px-2 sm:px-4" role="tablist">
+    <button v-for="t in tabs" :key="t.id" @click="go(t.id)" :data-on="tab===t.id?'1':'0'" role="tab"
+      class="tab text-[13px] font-medium px-3.5 sm:px-4 py-3.5 cursor-pointer bg-transparent"
+      >
+      {{ t.label }} <span v-if="t.count" class="opacity-50">{{ t.count }}</span>
+    </button>
+    <div class="ml-auto hidden md:flex items-center pr-3 text-[11.5px]" style="color:var(--dim)">
+      <kbd class="chip px-1.5 py-0.5 rounded mx-1">/</kbd> search
+      <kbd class="chip px-1.5 py-0.5 rounded mx-1">1-6</kbd> tabs
+    </div>
+  </nav>
+
+  <!-- ================= TAB: DECODER ================= -->
+  <section v-show="tab==='decoder'" class="p-5 sm:p-7">
+    <h2 class="sect">Ring of Light decoder</h2>
+    <p class="text-[13px] mb-4" style="color:var(--dim)">Hold <b class="text-white">Sync</b>, tap <b class="text-white">Eject</b> four times and count the lit quadrants for each digit. Click the quadrants below to match what your console shows &mdash; the diagnosis resolves live.</p>
+
+    <div class="grid lg:grid-cols-[auto_1fr] gap-4 items-start">
+      <div class="panel rounded p-4">
+        <div class="flex gap-2 sm:gap-3 flex-wrap justify-center">
+          <div v-for="(d,i) in digits" :key="i" class="text-center">
+            <div class="label mb-1" style="color:var(--dim)">Digit {{ i+1 }}</div>
+            <svg viewBox="0 0 100 100" width="80" height="80" :aria-label="'Digit '+(i+1)+' equals '+d">
+              <circle cx="50" cy="50" r="47" fill="#0d0f10" stroke="var(--line)"></circle>
+              <path v-for="q in 4" :key="q" :class="['ring-q', lit(d,q-1)?'on':'off']" :d="quad(q-1)"
+                    @click="setDigit(i, q===4?0:q)"></path>
+              <circle cx="50" cy="50" r="18" fill="#0b0d0e" stroke="var(--line)"></circle>
+              <text x="50" y="57" text-anchor="middle" class="mono" font-size="20" font-weight="700" fill="var(--acc)">{{ d }}</text>
+            </svg>
+            <div class="flex justify-center gap-1 mt-1">
+              <button v-for="n in [0,1,2,3]" :key="n" @click="setDigit(i,n)" :data-on="d===n?'1':'0'"
+                class="chip mono text-[10px] w-5 h-5 rounded leading-none cursor-pointer">{{ n }}</button>
+            </div>
+          </div>
         </div>
-        <div class="subtitle">Updated: 2026</div>
-    </header>
-
-    <nav class="tab-nav" role="tablist">
-        <button class="tab-btn active" data-tab="codes">Error Codes</button>
-        <button class="tab-btn" data-tab="motherboards">Motherboards</button>
-        <button class="tab-btn" data-tab="ranking">Ranking</button>
-        <button class="tab-btn" data-tab="models">Models</button>
-    </nav>
-
-    <!-- ================= TAB: ERROR CODES ================= -->
-    <div class="tab-panel active" id="tab-codes">
-        <div class="content-section">
-
-            <h2>[Tutorial] Retrieving Secondary Error Codes</h2>
-            <div class="sticky-post">
-                <h3>Read this before posting asking what your RROD means.</h3>
-                <p>If your console has 1, 3, and 4 flashing red lights on the Ring of Light (or a red light for slim and E) you have a hardware failure. The dashboard E-codes (like E74) also have corresponding hidden codes. Don't just guess or bake your motherboard in a towel. Get the exact code.</p>
-
-                <ol>
-                    <li>Turn the console on and wait for the red lights to flash.</li>
-                    <li>Press and <strong>hold</strong> the Sync button on the front.</li>
-                    <li>While holding Sync, press the <strong>Eject</strong> button on the DVD drive once.</li>
-                    <li>The flashing lights will change. Count the illuminated quadrants for that digit.</li>
-                    <li>Release Eject, then press it again (while still holding Sync). Repeat to read all <strong>4 digits</strong> in sequence.</li>
-                </ol>
-
-                <p class="rank-note">Each digit is a count of lit quadrants, so every digit is 0-3. The four digits together form the secondary code (e.g. <span class="error-code">0102</span>).</p>
-
-                <div class="code-grid">
-                    <div><span>&#9679;&#9679;&#9679;&#9679;</span> = 0</div>
-                    <div><span>&#9679;&#9675;&#9675;&#9675;</span> = 1</div>
-                    <div><span>&#9679;&#9679;&#9675;&#9675;</span> = 2</div>
-                    <div><span>&#9679;&#9679;&#9679;&#9675;</span> = 3</div>
-                </div>
-            </div>
-
-            <h2>[Database] Complete Error Code List</h2>
-
-            <div class="search-bar">
-                <label for="searchBox">Filter</label>
-                <input type="text" id="searchBox" placeholder="Filter by Code (e.g. 0102, E74), Board, or keyword...">
-            </div>
-
-            <div class="table-scroll">
-            <table id="dataTable">
-                <thead>
-                    <tr>
-                        <th class="col-w1" scope="col">Code</th>
-                        <th class="col-w2" scope="col">Sub-System</th>
-                        <th class="col-w3" scope="col">Common Boards</th>
-                        <th class="col-w4" scope="col">Scene Diagnosis &amp; Fix</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><span class="error-code">0001</span></td>
-                        <td><span class="sys-tag">Power</span></td>
-                        <td>All Phats</td>
-                        <td>12V line short. Test with a known working PSU. If it still fails, check the MOSFETs near the main power connector on the motherboard for a short to ground.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0002</span></td>
-                        <td><span class="sys-tag">Power/Eth</span></td>
-                        <td>Xenon, Zephyr</td>
-                        <td>CPU Vcore short. Usually a blown CPU MOSFET. Can also be a shorted Ethernet transformer chip on the back of the board.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0003</span></td>
-                        <td><span class="sys-tag">Power/GPU</span></td>
-                        <td>All</td>
-                        <td>GPU Vcore short. A power supply phase feeding the GPU is dead (bad MOSFET or capacitor) or the silicon inside the GPU is internally shorted.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0010</span></td>
-                        <td><span class="sys-tag">SB</span></td>
-                        <td>Xenon, Zephyr</td>
-                        <td>Southbridge is overheating or has cold joints. Check thermal connection. If fine, the chip may need a reflow/reball.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0011</span></td>
-                        <td><span class="sys-tag">CPU</span></td>
-                        <td>Phats</td>
-                        <td>CPU Overheating. Heatsink is unseated, thermal paste is dust, or fans have failed. Easiest RROD to fix.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0012</span></td>
-                        <td><span class="sys-tag">GPU</span></td>
-                        <td>Phats</td>
-                        <td>GPU Overheating. Check GPU heatsink seating. Ensure the x-clamps haven't popped off or lost tension.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0013</span></td>
-                        <td><span class="sys-tag">RAM</span></td>
-                        <td>Phats</td>
-                        <td>RAM Overheating. Often caused by terrible "penny tricks" or bolt-mods that bent the board and stressed the RAM thermal pads.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0020</span></td>
-                        <td><span class="sys-tag">GPU Boot</span></td>
-                        <td>All Phats</td>
-                        <td>GPU failed to respond to POST. Usually signifies a dying GPU die (bump failure) requiring chip replacement.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0021</span></td>
-                        <td><span class="sys-tag">DVD / SB</span></td>
-                        <td>Xenon, Falcon</td>
-                        <td>DVD Drive timeout or Southbridge failure. If testing a bare board with no DVD drive connected, your Southbridge is dead.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0022</span></td>
-                        <td><span class="sys-tag">CPU / NAND</span></td>
-                        <td>Jasper, Slims</td>
-                        <td>Fatal CPU failure or bad NAND data. On RGH consoles, means wrong CPU key or bad PLL soldering. On retail, usually unrepairable CPU death.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0023</span></td>
-                        <td><span class="sys-tag">SB</span></td>
-                        <td>All</td>
-                        <td>Southbridge to CPU communication error. Failing Southbridge chip or a severed pad on the FSB.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0031</span></td>
-                        <td><span class="sys-tag">RAM</span></td>
-                        <td>All</td>
-                        <td>RAM short circuit. A memory chip is damaged or bridged.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0032</span></td>
-                        <td><span class="sys-tag">CPU / RAM</span></td>
-                        <td>Xenon, Zephyr</td>
-                        <td>CPU to RAM comms failure. Board warping likely snapped microscopic traces under the CPU.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0033</span></td>
-                        <td><span class="sys-tag">RAM</span></td>
-                        <td>Phats</td>
-                        <td>RAM configuration error. Solder joints under a RAM module have failed. Requires RAM reball.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0100</span></td>
-                        <td><span class="sys-tag">GPU / RAM</span></td>
-                        <td>Xenon, Zephyr</td>
-                        <td>Cold solder joint under RAM or GPU. Common on consoles stored in damp environments.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0101</span></td>
-                        <td><span class="sys-tag">USB / SB</span></td>
-                        <td>Corona, Trinity</td>
-                        <td>Short on USB ports or dead Southbridge. Inspect front/rear USB ports for bent pins. If clear, the SB chip is dead (common on Coronas).</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0102</span></td>
-                        <td><span class="sys-tag">GPU</span></td>
-                        <td>Xenon, Falcon</td>
-                        <td><strong>The Classic RROD.</strong> Low-TG underfill beneath the GPU chip failed, breaking solder bumps inside the chip. The towel trick is a lie. Requires a GPU replacement.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0103</span></td>
-                        <td><span class="sys-tag">GPU</span></td>
-                        <td>Zephyr, Falcon</td>
-                        <td>CPU to GPU comms error. Structurally identical to 0102; the GPU die underfill has failed.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0110</span></td>
-                        <td><span class="sys-tag">RAM</span></td>
-                        <td>All</td>
-                        <td>Memory error. The GPU cannot communicate with the RAM. Dead RAM chip or cracked solder pad under a module.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">0203</span></td>
-                        <td><span class="sys-tag">Thermal</span></td>
-                        <td>Phats</td>
-                        <td>System control thermal failure. Tied to cracked joints under the GPU from severe board warping.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">1001</span></td>
-                        <td><span class="sys-tag">DVD</span></td>
-                        <td>All</td>
-                        <td>DVD Drive receiving improper voltage, or firmware on the PCB is bricked.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">1003</span></td>
-                        <td><span class="sys-tag">HDD</span></td>
-                        <td>All</td>
-                        <td>Hard Drive short. Remove HDD and boot. If it works, the HDD enclosure or drive is fried.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">1010</span></td>
-                        <td><span class="sys-tag">HDD</span></td>
-                        <td>All</td>
-                        <td>Secondary for E68. eFUSE mismatch or HDD error. Pull the hard drive.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">1013</span></td>
-                        <td><span class="sys-tag">Dashboard</span></td>
-                        <td>All</td>
-                        <td>Corrupt dashboard update. Console failed halfway through flashing. Put the dashboard update on a FAT32 USB and try booting.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">1022</span></td>
-                        <td><span class="sys-tag">HANA / GPU</span></td>
-                        <td>Zephyr, Falcon</td>
-                        <td>Secondary for E74. Faulty AV cable (pulling on port), dead HANA chip, or broken traces between GPU and HANA. Usually a dying GPU.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code">1033</span></td>
-                        <td><span class="sys-tag">CPU</span></td>
-                        <td>Jasper, Trinity</td>
-                        <td>Fatal CPU initialization failure. Dead CPU. Unrepairable without a donor chip and matching NAND dump.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code e-code">E64 / E65</span></td>
-                        <td><span class="sys-tag">DVD FW</span></td>
-                        <td>All</td>
-                        <td>DVD Drive Firmware error. Dashboard detects drive, but firmware OSKV doesn't match (usually a bad flashed firmware attempt).</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code e-code">E66</span></td>
-                        <td><span class="sys-tag">DVD Model</span></td>
-                        <td>All</td>
-                        <td>DVD Drive spoofing failed. Dashboard expects a Lite-On but detects a BenQ (or similar mismatch).</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code e-code">E68</span></td>
-                        <td><span class="sys-tag">HDD</span></td>
-                        <td>All</td>
-                        <td>Hard Drive error. Secondary code 1010. Remove HDD.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code e-code">E71 / E79</span></td>
-                        <td><span class="sys-tag">NAND</span></td>
-                        <td>All</td>
-                        <td>Dashboard corruption. Hold sync while booting to clear cache. If persistent, internal NAND blocks might be failing. Or a stray default.xex at the root of your USB is being picked up (shows E71 on screen).</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code e-code">E73</span></td>
-                        <td><span class="sys-tag">HANA / Eth</span></td>
-                        <td>Zephyr, Falcon</td>
-                        <td>Ethernet port or HANA chip hardware failure. Inspect ethernet pins. Otherwise, HANA needs reflow/replacement.</td>
-                    </tr>
-                    <tr>
-                        <td><span class="error-code e-code">E74</span></td>
-                        <td><span class="sys-tag">GPU</span></td>
-                        <td>Falcon</td>
-                        <td>Secondary code 1022. Breakdown of comms between GPU and HANA chip. Almost always a dying GPU requiring replacement.</td>
-                    </tr>
-                    <tr class="no-results" style="display:none;"><td colspan="4">No codes match that filter.</td></tr>
-                </tbody>
-            </table>
-            </div>
-
+        <div class="flex items-center justify-center gap-2 mt-4">
+          <button @click="digits=[0,0,0,0]" class="chip label px-3 py-1.5 rounded cursor-pointer">Reset</button>
+          <button @click="copy(code,'Code '+code+' copied')" class="chip label px-3 py-1.5 rounded cursor-pointer">Copy code</button>
+          <button @click="copy(permalink,'Permalink copied')" class="chip label px-3 py-1.5 rounded cursor-pointer">Copy link</button>
         </div>
+      </div>
+
+      <div class="panel rounded p-4 min-h-[230px]">
+        <div class="flex flex-wrap items-center gap-3 mb-3 pb-3" style="border-bottom:1px solid var(--line)">
+          <span class="code-pill text-[20px]">{{ code }}</span>
+          <span class="mono" style="color:var(--dim)">&rarr;</span>
+          <span class="code-pill text-[20px]">E{{ ecode }}</span>
+          <span class="text-[11px] leading-tight" style="color:var(--dim)">the secondary code is<br>the E-code written in base&nbsp;4</span>
+        </div>
+        <template v-if="match">
+          <div class="flex flex-wrap gap-1.5 mb-2">
+            <span class="chip px-2 py-0.5 rounded label">{{ match.sys }}</span>
+            <span v-if="match.severity" class="px-2 py-0.5 rounded label capitalize" :style="sevStyle(match.severity)">{{ match.severity }}</span>
+            <span v-if="match.difficulty" class="chip px-2.5 py-0.5 rounded label capitalize">Fix: {{ match.difficulty }}</span>
+            <span class="chip px-2 py-0.5 rounded mono text-[10px]">{{ match.boards }}</span>
+          </div>
+          <p class="text-[14px] text-white leading-relaxed">{{ match.fix }}</p>
+          <div v-if="match.detail" class="mt-3 pt-3 text-[13px]" style="border-top:1px solid var(--line);color:var(--txt)">
+            <span class="label block mb-1" style="color:var(--dim)">Deeper</span>{{ match.detail }}
+          </div>
+          <div v-if="match.related && match.related.length" class="mt-3 flex flex-wrap gap-1.5 items-center">
+            <span class="label" style="color:var(--dim)">Related</span>
+            <button v-for="r in match.related" :key="r" @click="loadCode(r)" class="chip px-2 py-0.5 rounded mono text-[11px] cursor-pointer hover:text-white">{{ r }}</button>
+          </div>
+        </template>
+        <template v-else>
+          <p class="text-[13px]" style="color:var(--dim)">No entry for <b class="acc mono">{{ code }}</b> yet &mdash; either an unused combination or an undocumented one. Re-count your digits, or jump to the nearest documented codes:</p>
+          <div class="flex flex-wrap gap-1.5 mt-3">
+            <button v-for="n in neighbours" :key="n.code" @click="loadCode(n.code)"
+              class="chip px-2 py-1 rounded mono text-[11px] cursor-pointer hover:text-white">{{ n.code }} · {{ n.sys }}</button>
+          </div>
+        </template>
+      </div>
     </div>
 
-    <!-- ================= TAB: MOTHERBOARDS ================= -->
-    <div class="tab-panel" id="tab-motherboards">
-        <div class="content-section">
-
-            <h2>[Info] Xbox 360 Motherboard Revisions</h2>
-            <div class="mobo-container">
-
-                <div class="mobo-box">
-                    <h4>Xenon <span class="year">2005 (Launch)</span></h4>
-                    <ul class="mobo-stats">
-                        <li><strong>Models:</strong> Core / Premium (No HDMI)</li>
-                        <li><strong>Process:</strong> 90nm CPU / 90nm GPU</li>
-                        <li><strong>PSU:</strong> 203W (16.5A)</li>
-                    </ul>
-                    <div class="mobo-desc">
-                        The launch board. Notorious for a massive failure rate. Plagued by 0102/0110 errors caused by poor low-TG underfill on the GPU BGA failing under thermal stress. Avoid buying these.
-                    </div>
-                </div>
-
-                <div class="mobo-box">
-                    <h4>Zephyr <span class="year">2007</span></h4>
-                    <ul class="mobo-stats">
-                        <li><strong>Models:</strong> Elite / Premium (Added HDMI)</li>
-                        <li><strong>Process:</strong> 90nm CPU / 90nm GPU</li>
-                        <li><strong>PSU:</strong> 203W (16.5A)</li>
-                    </ul>
-                    <div class="mobo-desc">
-                        Added the HDMI port and the HANA scaler chip. Unfortunately, it uses the exact same flawed 90nm GPU design as Xenon. Extremely prone to E74 and 0102.
-                    </div>
-                </div>
-
-                <div class="mobo-box">
-                    <h4>Early Falcon <span class="year">Late 2007</span></h4>
-                    <ul class="mobo-stats">
-                        <li><strong>Models:</strong> Arcade / Pro / Elite</li>
-                        <li><strong>Process:</strong> 65nm CPU / 90nm GPU</li>
-                        <li><strong>PSU:</strong> 175W (14.2A)</li>
-                    </ul>
-                    <div class="mobo-desc">
-                        Introduced a cooler 65nm CPU. However, it kept the old 90nm GPU. Because of the HANA chip and board layout, E74 (connection break between GPU and HANA) spiked massively here.
-                    </div>
-                </div>
-
-                <div class="mobo-box highlight">
-                    <h4>Late Falcon (v2) <span class="year">Mid 2008 (The Fix)</span></h4>
-                    <ul class="mobo-stats">
-                        <li><strong>Models:</strong> Late Pro / Arcade</li>
-                        <li><strong>Process:</strong> 65nm CPU / 80nm GPU (Rhea)</li>
-                        <li><strong>PSU:</strong> 175W (14.2A)</li>
-                    </ul>
-                    <div class="mobo-desc">
-                        A stealth revision by Microsoft. They swapped the GPU to an 80nm "Rhea" chip with high-TG underfill. If you have a Falcon manufactured in mid-to-late 2008, it is highly resilient to RROD. A solid board.
-                    </div>
-                </div>
-
-                <div class="mobo-box">
-                    <h4>Opus <span class="year">2008</span></h4>
-                    <ul class="mobo-stats">
-                        <li><strong>Models:</strong> Warranty Replacements Only</li>
-                        <li><strong>Process:</strong> 65nm CPU / 80nm GPU</li>
-                        <li><strong>PSU:</strong> 175W (14.2A) - No HDMI</li>
-                    </ul>
-                    <div class="mobo-desc">
-                        A Frankenstein board. This is a Falcon architecture reshaped to fit inside a broken Xenon case (which lacks an HDMI cutout). Used solely for Microsoft repair center returns.
-                    </div>
-                </div>
-
-                <div class="mobo-box">
-                    <h4>Jasper <span class="year">Late 2008</span></h4>
-                    <ul class="mobo-stats">
-                        <li><strong>Models:</strong> Arcade / Pro / Elite</li>
-                        <li><strong>Process:</strong> 65nm CPU / 65nm GPU</li>
-                        <li><strong>PSU:</strong> 150W (12.1A)</li>
-                    </ul>
-                    <div class="mobo-desc">
-                        The true fix. Shrunk the GPU to 65nm, finally eliminating the massive heat and underfill issues. Arcade units had 16MB/256MB/512MB internal memory built onto the board.
-                    </div>
-                </div>
-
-                <div class="mobo-box highlight">
-                    <h4>Tonasket (Kronos) <span class="year">Late 2009</span></h4>
-                    <ul class="mobo-stats">
-                        <li><strong>Models:</strong> Final Phat Runs (Super Elite)</li>
-                        <li><strong>Process:</strong> 65nm CPU / 65nm GPU (65nm eDRAM)</li>
-                        <li><strong>PSU:</strong> 150W (12.1A)</li>
-                    </ul>
-                    <div class="mobo-desc">
-                        Often called "Jasper v2". Reduced the physical size of the eDRAM on the GPU. Widely considered by the modding scene to be the most bulletproof Xbox 360 phat motherboard ever made.
-                    </div>
-                </div>
-
-                <div class="mobo-box">
-                    <h4>Trinity <span class="year">2010</span></h4>
-                    <ul class="mobo-stats">
-                        <li><strong>Models:</strong> Xbox 360 S (Glossy)</li>
-                        <li><strong>Process:</strong> 45nm CGPU (Combined)</li>
-                        <li><strong>PSU:</strong> 135W (10.83A)</li>
-                    </ul>
-                    <div class="mobo-desc">
-                        First Slim board. Combined the CPU and GPU into one chip (CGPU). Kept the HANA chip. Very reliable. When it fails, it usually throws a "Red Dot of Death" (0101).
-                    </div>
-                </div>
-
-                <div class="mobo-box">
-                    <h4>Corona (V1 - V6) <span class="year">2011 - 2013</span></h4>
-                    <ul class="mobo-stats">
-                        <li><strong>Models:</strong> Xbox 360 S / Xbox 360 E</li>
-                        <li><strong>Process:</strong> 45nm CGPU</li>
-                        <li><strong>PSU:</strong> 120W / 115W (9.6A)</li>
-                    </ul>
-                    <div class="mobo-desc">
-                        Removed the HANA chip and integrated it into the Southbridge. Introduced 4GB eMMC NANDs. Southbridge failures and dead 4GB NANDs are the most common faults here.
-                    </div>
-                </div>
-
-                <div class="mobo-box">
-                    <h4>Winchester <span class="year">2014</span></h4>
-                    <ul class="mobo-stats">
-                        <li><strong>Models:</strong> Late Xbox 360 E</li>
-                        <li><strong>Process:</strong> 45nm CGPU (No IHS)</li>
-                        <li><strong>PSU:</strong> 115W (9.6A)</li>
-                    </ul>
-                    <div class="mobo-desc">
-                        The final revision. Microsoft removed the metal Integrated Heat Spreader (IHS) from the CGPU. Extremely reliable hardware-wise.
-                    </div>
-                </div>
-            </div>
-
-        </div>
+    <h2 class="sect mt-8">E-code &harr; secondary converter</h2>
+    <div class="panel rounded p-4 flex flex-wrap items-center gap-3">
+      <label class="label" style="color:var(--dim)" for="ec">Dashboard E-code</label>
+      <span class="mono acc font-bold">E</span>
+      <input id="ec" v-model="eInput" type="number" min="0" max="255" class="mono w-24 px-2 py-1.5 rounded"
+             style="background:var(--panel-2);border:1px solid var(--line);color:var(--acc)">
+      <span class="mono text-[12px]" style="color:var(--dim)">= secondary</span>
+      <span class="code-pill text-[16px]">{{ eToSecondary }}</span>
+      <button @click="loadCode(eToSecondary)" class="chip label px-3 py-1.5 rounded cursor-pointer">Load in decoder</button>
+      <span class="text-[12px] basis-full" style="color:var(--dim)">E74 = 1022, E68 = 1010, E71 = 1013 &mdash; same number, different base.</span>
     </div>
 
-    <!-- ================= TAB: RANKING ================= -->
-    <div class="tab-panel" id="tab-ranking">
-        <div class="content-section">
-
-            <h2>[Ranking] Motherboard Reliability Tier List</h2>
-            <p class="rank-note">Scene consensus, ranked on how likely the board is to still be alive and stay alive with a proper thermal job. Not a performance ranking &mdash; every 360 board performs identically.</p>
-            <p class="rank-note">S+ boards are the ones worth chasing; F boards are the doomed 90nm designs &mdash; buy only as a last resort and expect to reflow or replace the GPU.</p>
-
-            <div class="tier-row">
-                <div class="tier-label tier-s">S+</div>
-                <div class="tier-items">
-                    <span class="tier-chip">Winchester</span>
-                    <span class="tier-chip">Tonasket / Kronos</span>
-                </div>
-            </div>
-            <div class="tier-row">
-                <div class="tier-label tier-sp">S</div>
-                <div class="tier-items">
-                    <span class="tier-chip">Jasper</span>
-                    <span class="tier-chip">Trinity</span>
-                </div>
-            </div>
-            <div class="tier-row">
-                <div class="tier-label tier-a">A</div>
-                <div class="tier-items">
-                    <span class="tier-chip">Late Falcon v2 (Rhea)</span>
-                    <span class="tier-chip">Corona V2-V5</span>
-                </div>
-            </div>
-            <div class="tier-row">
-                <div class="tier-label tier-b">B</div>
-                <div class="tier-items">
-                    <span class="tier-chip">Opus</span>
-                    <span class="tier-chip">Corona V1</span>
-                    <span class="tier-chip">Corona V6</span>
-                </div>
-            </div>
-            <div class="tier-row">
-                <div class="tier-label tier-c">C</div>
-                <div class="tier-items">
-                    <span class="tier-chip">Early Falcon</span>
-                </div>
-            </div>
-            <div class="tier-row">
-                <div class="tier-label tier-f">F</div>
-                <div class="tier-items">
-                    <span class="tier-chip">Zephyr</span>
-                    <span class="tier-chip">Xenon</span>
-                </div>
-            </div>
-
-            <h2>[Ranking] Detailed Scoreboard</h2>
-            <div class="table-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">Rank</th>
-                        <th scope="col">Board</th>
-                        <th scope="col">Reliability</th>
-                        <th scope="col">Why it sits here</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>1</td>
-                        <td><strong>Winchester</strong></td>
-                        <td>10 / 10</td>
-                        <td>No IHS, coolest-running CGPU, effectively zero failure reports. The most reliable 360 board made.</td>
-                    </tr>
-                    <tr>
-                        <td>2</td>
-                        <td><strong>Tonasket (Kronos)</strong></td>
-                        <td>10 / 10</td>
-                        <td>Smallest-die phat, best underfill, tiny eDRAM. The "buy it for life" phat.</td>
-                    </tr>
-                    <tr>
-                        <td>3</td>
-                        <td><strong>Jasper</strong></td>
-                        <td>9 / 10</td>
-                        <td>65nm GPU killed the RROD era. The phat that finally ran cool and stayed alive.</td>
-                    </tr>
-                    <tr>
-                        <td>4</td>
-                        <td><strong>Trinity</strong></td>
-                        <td>9 / 10</td>
-                        <td>First slim, unified CGPU, runs cool. Occasional 0101 Southbridge/USB death, otherwise dependable.</td>
-                    </tr>
-                    <tr>
-                        <td>5</td>
-                        <td><strong>Late Falcon v2 (Rhea)</strong></td>
-                        <td>8 / 10</td>
-                        <td>80nm Rhea GPU with high-TG underfill. The one phat Falcon worth trusting if it's a mid/late-2008 build.</td>
-                    </tr>
-                    <tr>
-                        <td>6</td>
-                        <td><strong>Corona V2-V5</strong></td>
-                        <td>7 / 10</td>
-                        <td>Coolest slim-era silicon, but the 4GB eMMC and integrated Southbridge are the weak points.</td>
-                    </tr>
-                    <tr>
-                        <td>7</td>
-                        <td><strong>Opus</strong></td>
-                        <td>7 / 10</td>
-                        <td>Falcon-class silicon in a Xenon shell. Fine board, but rare and no HDMI.</td>
-                    </tr>
-                    <tr>
-                        <td>8</td>
-                        <td><strong>Corona V1 / V6</strong></td>
-                        <td>6 / 10</td>
-                        <td>V1 is an early run with more eMMC issues; V6 is a stripped late revision.</td>
-                    </tr>
-                    <tr>
-                        <td>9</td>
-                        <td><strong>Early Falcon</strong></td>
-                        <td>4 / 10</td>
-                        <td>65nm CPU but still the old 90nm GPU. E74 capital of the 360 world.</td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td><strong>Zephyr</strong></td>
-                        <td>2 / 10</td>
-                        <td>Xenon internals plus HDMI. Same doomed 90nm GPU, same 0102/E74 fate.</td>
-                    </tr>
-                    <tr>
-                        <td>11</td>
-                        <td><strong>Xenon</strong></td>
-                        <td>1 / 10</td>
-                        <td>Launch board, worst underfill, highest RROD rate ever recorded on a console. Collector curiosity only.</td>
-                    </tr>
-                </tbody>
-            </table>
-            </div>
-
+    <h2 class="sect mt-8">Reading the code</h2>
+    <div class="panel rounded p-4">
+      <ol class="list-decimal ml-5 space-y-1 text-[13px]">
+        <li>Power the console on and wait for the red lights.</li>
+        <li>Press and <b class="text-white">hold</b> the Sync button on the front.</li>
+        <li>Still holding Sync, press <b class="text-white">Eject</b> once &mdash; the lights change to digit 1.</li>
+        <li>Release Eject and press it again for each of the <b class="text-white">4 digits</b>.</li>
+        <li>Every digit is 0&ndash;3, counted from the lit quadrants.</li>
+      </ol>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
+        <div v-for="n in [0,1,2,3]" :key="n" class="panel rounded p-2 text-center">
+          <svg viewBox="0 0 100 100" width="52" height="52" class="mx-auto">
+            <circle cx="50" cy="50" r="47" fill="#0d0f10" stroke="var(--line)"></circle>
+            <path v-for="q in 4" :key="q" :class="['ring-q','static', lit(n,q-1)?'on':'off']" :d="quad(q-1)"></path>
+            <circle cx="50" cy="50" r="18" fill="#0b0d0e" stroke="var(--line)"></circle>
+          </svg>
+          <div class="mono text-[11px] mt-1" style="color:var(--dim)">= <b class="acc">{{ n }}</b></div>
         </div>
+      </div>
+      <p class="text-[12px] mt-3" style="color:var(--dim)">Don't guess, and don't bake the board in a towel. Get the exact code first.</p>
+    </div>
+  </section>
+
+  <!-- ================= TAB: CODES ================= -->
+  <section v-show="tab==='codes'" class="p-5 sm:p-7">
+    <h2 class="sect">Secondary error codes</h2>
+    <div class="flex flex-wrap gap-2 items-center mb-3">
+      <input ref="search" v-model="q" placeholder="Fuzzy search: 0102, E74, GPU, Jasper, underfill..."
+             class="flex-1 min-w-[220px] px-3.5 py-2.5 rounded text-[13.5px]"
+             style="background:var(--panel-2);border:1px solid var(--line);color:var(--hi)">
+      <button v-if="q" @click="q=''" class="chip label px-3 py-2 rounded cursor-pointer">Clear</button>
+      <span class="mono text-[11px]" style="color:var(--dim)">{{ shown.length }} / {{ DB.errors.length }}</span>
+    </div>
+    <div class="flex flex-wrap gap-1.5 mb-4">
+      <button @click="sysSel=[]" :data-on="sysSel.length?'0':'1'" class="chip label px-2 py-1 rounded cursor-pointer">All</button>
+      <button v-for="s in systems" :key="s" @click="toggleSys(s)" :data-on="sysSel.includes(s)?'1':'0'"
+              class="chip label px-2 py-1 rounded cursor-pointer">{{ s }}</button>
     </div>
 
-    <!-- ================= TAB: MODELS ================= -->
-    <div class="tab-panel" id="tab-models">
-        <div class="content-section">
+    <div class="panel rounded overflow-hidden">
+      <div class="overflow-x-auto max-h-[70vh]">
+        <table>
+          <thead><tr>
+            <th style="width:88px">Code</th><th style="width:66px">Cross-ref</th><th style="width:118px">Sub-system</th>
+            <th style="width:96px">Severity</th><th style="width:150px">Boards</th><th>Diagnosis &amp; fix</th>
+          </tr></thead>
+          <tbody>
+            <template v-for="e in shown" :key="e.code">
+              <tr @click="expand = expand===e.code ? '' : e.code" class="cursor-pointer">
+                <td><span class="code-pill" v-html="hl(e.code)"></span></td>
+                <td class="mono text-[12px]" style="color:var(--dim)">{{ eOf(e.code) }}</td>
+                <td><span class="chip px-2.5 py-0.5 rounded label whitespace-nowrap">{{ e.sys }}</span></td>
+                <td><span v-if="e.severity" class="px-2 py-0.5 rounded label whitespace-nowrap capitalize" :style="sevStyle(e.severity)">{{ e.severity }}</span></td>
+                <td class="text-[12px]" style="color:var(--dim)" v-html="hl(e.boards)"></td>
+                <td class="text-[13px]"><span v-html="hl(e.fix)"></span>
+                  <span class="acc text-[11px] ml-1.5 align-middle">{{ expand===e.code ? '▾' : '▸' }}</span></td>
+              </tr>
+              <tr v-if="expand===e.code" style="background:#0e1112">
+                <td colspan="6" class="text-[13px]">
+                  <div class="flex flex-wrap gap-3 items-start">
+                    <div class="flex-1 min-w-[280px]">
+                      <span class="label block mb-1" style="color:var(--dim)">Deeper</span>
+                      {{ e.detail || 'No extra notes yet.' }}
+                    </div>
+                    <div class="text-[12px] space-y-1" style="color:var(--dim)">
+                      <div v-if="e.difficulty">Fix difficulty: <b class="acc capitalize">{{ e.difficulty }}</b></div>
+                      <div>Cross-ref: <b class="acc">{{ eOf(e.code) }}</b></div>
+                      <div class="flex gap-1.5 flex-wrap items-center" v-if="e.related && e.related.length">Related:
+                        <button v-for="r in e.related" :key="r" @click.stop="loadCode(r)" class="chip px-1.5 py-0.5 rounded cursor-pointer hover:text-white">{{ r }}</button>
+                      </div>
+                      <button @click.stop="loadCode(e.code)" class="chip px-2.5 py-1 rounded cursor-pointer">Open in decoder &rarr;</button>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </template>
+            <tr v-if="!shown.length"><td colspan="6" class="text-center py-10" style="color:var(--dim)">No match for "{{ q }}"</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <p class="text-[12px] mt-3" style="color:var(--dim)">Click any row to expand. Codes not listed are undocumented rather than impossible &mdash; PRs welcome.</p>
+  </section>
 
-            <h2>[Info] Every Xbox 360 Model</h2>
-            <p class="rank-note">Three console generations &mdash; the original "Phat" (2005), the Xbox 360 S / "Slim" (2010), and the Xbox 360 E (2013) &mdash; each sold in several storage/bundle configurations. Region-exclusive re-boxes are noted where they matter.</p>
-
-            <h2>[Models] Original Xbox 360 "Phat" (2005 - 2010)</h2>
-            <div class="table-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">SKU</th>
-                        <th scope="col">Years</th>
-                        <th scope="col">Storage</th>
-                        <th scope="col">Finish</th>
-                        <th scope="col">Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Core</strong></td>
-                        <td>2005 - 2007</td>
-                        <td>None (memory unit only)</td>
-                        <td>Matte white</td>
-                        <td>Bare entry model: no HDD, composite cable, wired controller. Discontinued for the Arcade.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Pro / Premium</strong></td>
-                        <td>2005 - 2009</td>
-                        <td>20 / 60 GB HDD</td>
-                        <td>Matte white</td>
-                        <td>The "standard" launch console: detachable HDD, wireless controller, component HD cable, headset.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Arcade</strong></td>
-                        <td>2007 - 2010</td>
-                        <td>256 MB &rarr; 512 MB internal (+ optional HDD)</td>
-                        <td>Matte white</td>
-                        <td>Replaced Core. Onboard flash instead of an HDD, 5 Arcade games, HDMI added on later Falcon/Jasper runs.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Elite</strong></td>
-                        <td>2007 - 2010</td>
-                        <td>120 / 250 GB HDD</td>
-                        <td>Matte black</td>
-                        <td>First black 360, first with HDMI as standard, black accessories. "Super Elite" 250 GB arrived 2010.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Elite (250 GB) / bundles</strong></td>
-                        <td>2010</td>
-                        <td>250 GB HDD</td>
-                        <td>Matte black</td>
-                        <td>Final Phat retail configuration, sold alongside the newly launched Slim before being retired.</td>
-                    </tr>
-                </tbody>
-            </table>
-            </div>
-
-            <h2>[Models] Xbox 360 S / "Slim" (2010 - 2013)</h2>
-            <div class="table-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">SKU</th>
-                        <th scope="col">Years</th>
-                        <th scope="col">Storage</th>
-                        <th scope="col">Finish</th>
-                        <th scope="col">Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>4 GB</strong></td>
-                        <td>2010 - 2013</td>
-                        <td>4 GB internal (eMMC/NAND)</td>
-                        <td>Matte black</td>
-                        <td>Budget SKU. Soldered flash, no 2.5" bay populated. Dedicated Kinect port, built-in Wi-Fi, touch-sensitive power/eject.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>250 GB</strong></td>
-                        <td>2010 - 2013</td>
-                        <td>250 GB 2.5" HDD</td>
-                        <td>Glossy black</td>
-                        <td>The mainstream Slim. Proprietary internal laptop-style drive behind a side hatch.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>320 GB (bundle)</strong></td>
-                        <td>2012 - 2013</td>
-                        <td>320 GB 2.5" HDD</td>
-                        <td>Glossy / matte</td>
-                        <td>Only sold in game/Kinect bundles (Halo 4, Holiday), never as a standalone box.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>4 GB + Kinect</strong></td>
-                        <td>2010 - 2013</td>
-                        <td>4 GB internal</td>
-                        <td>Matte black</td>
-                        <td>Standard Kinect starter bundle. Same console as the plain 4 GB.</td>
-                    </tr>
-                </tbody>
-            </table>
-            </div>
-
-            <h2>[Models] Xbox 360 E (2013 - 2016)</h2>
-            <div class="table-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">SKU</th>
-                        <th scope="col">Years</th>
-                        <th scope="col">Storage</th>
-                        <th scope="col">Finish</th>
-                        <th scope="col">Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>4 GB</strong></td>
-                        <td>2013 - 2016</td>
-                        <td>4 GB internal</td>
-                        <td>Matte black (two-tone)</td>
-                        <td>Xbox One-styled restyle. Dropped one USB port, S/PDIF and the original AV multi-out; component video gone.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>250 GB</strong></td>
-                        <td>2013 - 2016</td>
-                        <td>250 GB 2.5" HDD</td>
-                        <td>Matte black (two-tone)</td>
-                        <td>Mainstream E. Same internals as a late Corona/Winchester Slim in a new shell.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>500 GB (bundle)</strong></td>
-                        <td>2014 - 2015</td>
-                        <td>500 GB 2.5" HDD</td>
-                        <td>Matte black</td>
-                        <td>Late GTA V / Forza Horizon 2 bundles. Rarest factory storage size.</td>
-                    </tr>
-                </tbody>
-            </table>
-            </div>
-
-            <h2>[Info] Notable Limited &amp; Special Editions</h2>
-            <p class="rank-note">Console-only cosmetic runs are listed; game-bundle-only boxes with no hardware restyle are skipped. "Custom boot" = unique startup animation and/or power-on chime.</p>
-            <div class="table-scroll">
-            <table>
-                <thead>
-                    <tr>
-                        <th scope="col">Edition</th>
-                        <th scope="col">Year</th>
-                        <th scope="col">Gen</th>
-                        <th scope="col">What's special</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Halo 3 Special Edition</strong></td>
-                        <td>2007</td>
-                        <td>Phat</td>
-                        <td>"Spartan" green &amp; gold shell, matching controller, Halo boot chime. 20 GB HDD. The first limited 360.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>The Simpsons Movie</strong></td>
-                        <td>2007</td>
-                        <td>Phat</td>
-                        <td>Contest-only yellow console with Simpsons cloud faceplate. Roughly 100 made &mdash; one of the rarest 360s.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Resident Evil 5</strong></td>
-                        <td>2009</td>
-                        <td>Phat</td>
-                        <td>Japan/US Elite in custom red with RE5 artwork, red controller. 120 GB.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Modern Warfare 2</strong></td>
-                        <td>2009</td>
-                        <td>Phat</td>
-                        <td>Dark grey/olive Elite with laser-etched MW2 logo, red ring of light, custom boot. 250 GB.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Final Fantasy XIII (Lightning Edition)</strong></td>
-                        <td>2009</td>
-                        <td>Phat</td>
-                        <td>Japan-only pearl-white Elite with airbrushed Lightning art, white controller. 250 GB.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Special Edition Blue</strong></td>
-                        <td>2010</td>
-                        <td>Phat</td>
-                        <td>Translucent blue Elite shell + blue controller, first sold in the "Family Bundle". Also Japan retail.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Halo: Reach</strong></td>
-                        <td>2010</td>
-                        <td>Slim (S)</td>
-                        <td>Silver/black UNSC etching, matching controllers, Reach boot animation + sounds. 250 GB. First limited Slim.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Kinect Star Wars (R2-D2 / C-3PO)</strong></td>
-                        <td>2012</td>
-                        <td>Slim (S)</td>
-                        <td>R2-D2-painted console with astromech beeps for the power/eject tones, gold C-3PO controller, white Kinect. 320 GB.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Gears of War 3</strong></td>
-                        <td>2011</td>
-                        <td>Slim (S)</td>
-                        <td>Weathered red/brown "Crimson Omen" shell, custom controller, Gears boot sounds. 320 GB.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Star Wars: The Old Republic / MW3 / Battlefield 3</strong></td>
-                        <td>2011</td>
-                        <td>Slim (S)</td>
-                        <td>Bundle consoles with themed sleeves/decals but standard black hardware underneath.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Halo 4</strong></td>
-                        <td>2012</td>
-                        <td>Slim (S)</td>
-                        <td>Blue-accented grey shell, "Forward Unto Dawn" laser etching, blue controllers, custom boot + sounds. 320 GB.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Chrome Series (Red / Blue / Silver)</strong></td>
-                        <td>2012 - 2013</td>
-                        <td>Slim (S)</td>
-                        <td>Region-limited mirror-chrome side panels over the glossy 320 GB Slim.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>GTA V</strong></td>
-                        <td>2013</td>
-                        <td>Slim (S)</td>
-                        <td>Blue-accented 500 GB Slim with GTA V branding, custom controller, unique boot. Last major limited 360.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Forza Horizon 2 / Sunset Overdrive era</strong></td>
-                        <td>2014 - 2015</td>
-                        <td>E</td>
-                        <td>Late 500 GB E bundles &mdash; decals and packaging only, no shell restyle.</td>
-                    </tr>
-                </tbody>
-            </table>
-            </div>
-
+  <!-- ================= TAB: BOARDS ================= -->
+  <section v-show="tab==='boards'" class="p-5 sm:p-7">
+    <h2 class="sect">Motherboard revisions</h2>
+    <p class="text-[13px] mb-3" style="color:var(--dim)">Ten revisions over nine years. Tier badges come from the reliability ranking; modding notes cover JTAG/RGH compatibility.</p>
+    <div class="flex flex-wrap gap-1.5 mb-4">
+      <button v-for="f in [['','All'],['safe','Safe to buy (S+/S/A)'],['risky','Risky (B/C/F)'],['glitch','RGH/JTAG capable']]" :key="f[0]"
+              @click="boardFilter=f[0]" :data-on="boardFilter===f[0]?'1':'0'"
+              class="chip label px-2 py-1 rounded cursor-pointer">{{ f[1] }}</button>
+    </div>
+    <div class="grid md:grid-cols-2 gap-3">
+      <article v-for="m in boards" :key="m.name" class="panel rounded p-4 relative">
+        <h3 class="flex items-center gap-2.5 text-[16px] font-semibold text-white m-0 tracking-[-0.01em]">
+          <span v-if="m.tier" :class="'tierbox tier-'+m.tier" class="w-11 h-7 text-[14px] shrink-0">{{ m.tier }}</span>
+          <span class="min-w-0">{{ m.name }}
+            <span class="text-[11px] font-normal" style="color:var(--dim)">{{ m.year }}</span></span></h3>
+        <div v-if="m.risk!=null" class="flex items-center gap-2 mt-2">
+          <span class="label w-[74px]" style="color:var(--dim)">RROD risk</span>
+          <div class="h-1.5 rounded-full flex-1" style="background:var(--panel-2)">
+            <div class="h-1.5 rounded-full" :style="{width:m.risk+'%',background:riskColor(m.risk),boxShadow:'0 0 8px '+riskColor(m.risk)}"></div>
+          </div>
+          <span class="mono text-[10px]" :style="{color:riskColor(m.risk)}">{{ m.risk }}%</span>
         </div>
+        <dl class="grid grid-cols-[74px_1fr] gap-x-2 gap-y-0.5 my-2 text-[12px]">
+          <template v-for="(v,k) in m.stats" :key="k">
+            <dt class="label pt-0.5" style="color:var(--dim)">{{ k }}</dt><dd class="m-0">{{ v }}</dd>
+          </template>
+        </dl>
+        <p class="text-[13px] m-0 pt-2" style="border-top:1px solid var(--line)">{{ m.desc }}</p>
+        <div v-if="m.faults" class="mt-2 text-[12px]">
+          <span class="label" style="color:var(--dim)">Fails first &nbsp;</span>{{ m.faults }}
+        </div>
+        <div v-if="m.mod" class="mt-2 text-[12px]">
+          <span class="label" style="color:var(--dim)">Modding &nbsp;</span>{{ m.mod }}
+        </div>
+        <div v-if="m.codes && m.codes.length" class="flex flex-wrap gap-1.5 mt-3 pt-2" style="border-top:1px solid var(--line)">
+          <span class="label pt-1" style="color:var(--dim)">Its codes</span>
+          <button v-for="c in m.codes" :key="c" @click="loadCode(c)" class="chip px-2 py-0.5 rounded mono text-[11px] cursor-pointer hover:text-white">{{ c }}</button>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= TAB: SOFTMODS ================= -->
+  <section v-show="tab==='softmods'" class="p-5 sm:p-7">
+    <h2 class="sect">Softmod &amp; glitch matrix</h2>
+    <p class="text-[13px] mb-4" style="color:var(--dim)">What each board can actually run. JTAG and RGH depend on the hardware; <b class="acc">BadUpdate is software only</b>, so it works on every revision &mdash; including the two that no glitch hack can touch.</p>
+    <div class="panel rounded overflow-hidden mb-8">
+      <div class="overflow-x-auto">
+        <table>
+          <thead><tr><th>Board</th><th>Tier</th><th>JTAG</th><th>RGH</th><th>BadUpdate</th></tr></thead>
+          <tbody>
+            <tr v-for="m in DB.mobos" :key="m.name" v-show="m.compat">
+              <td class="font-bold text-white whitespace-nowrap">{{ m.name }}</td>
+              <td><span v-if="m.tier" :class="'tierbox tier-'+m.tier" class="w-8 h-6 text-[11.5px]">{{ m.tier }}</span></td>
+              <td class="text-[12px]" :style="{color: m.compat.jtag.startsWith('No') ? 'var(--dim)' : 'var(--txt)'}">{{ m.compat.jtag }}</td>
+              <td class="text-[12px]" :style="{color: m.compat.rgh.startsWith('None') ? 'var(--dim)' : 'var(--txt)'}">{{ m.compat.rgh }}</td>
+              <td class="text-[12px] acc">{{ m.compat.badupdate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
 
+    <template v-if="BU">
+      <h2 class="sect">{{ BU.name }}</h2>
+      <div class="grid lg:grid-cols-2 gap-3">
+        <div class="panel rounded p-4">
+          <div class="chip inline-block px-2 py-0.5 rounded label mb-2" data-on="1">{{ BU.tag }}</div>
+          <p class="text-[13px] text-white leading-relaxed m-0">{{ BU.summary }}</p>
+          <h3 class="label mt-4 mb-1" style="color:var(--dim)">You need</h3>
+          <ul class="list-disc ml-5 text-[13px] space-y-1">
+            <li v-for="r in BU.requires" :key="r">{{ r }}</li>
+          </ul>
+          <h3 class="label mt-4 mb-1.5" style="color:var(--dim)">Releases</h3>
+          <div class="space-y-1.5">
+            <a v-for="v in BU.variants" :key="v[0]" :href="v[3]" target="_blank" rel="noopener"
+               class="panel rounded flex flex-wrap items-baseline gap-x-2 gap-y-0.5 px-3 py-2 transition-colors">
+              <span class="text-[13px] font-semibold acc">{{ v[0] }}</span>
+              <span class="text-[11.5px]" style="color:var(--dim)">by {{ v[1] }}</span>
+              <span class="text-[12px] basis-full" style="color:var(--dim)">{{ v[2] }}</span>
+            </a>
+          </div>
+          <a :href="BU.link" class="chip inline-block label px-3 py-1.5 rounded mt-3 acc hover:text-white">Free60 write-up &#8599;</a>
+        </div>
+        <div class="panel rounded p-4">
+          <h3 class="label mb-2" style="color:var(--dim)">Trigger games</h3>
+          <div v-for="e in BU.entries" :key="e[0]" class="pb-2 mb-2" style="border-bottom:1px solid var(--line)">
+            <div class="text-[14px] font-semibold acc">{{ e[0] }}</div>
+            <div class="label" style="color:var(--dim)">via {{ e[1] }}</div>
+            <div class="text-[12px] mt-0.5">{{ e[2] }}</div>
+          </div>
+          <h3 class="label mt-3 mb-1" style="color:var(--dim)">Read this first</h3>
+          <ul class="list-disc ml-5 text-[13px] space-y-0.5">
+            <li v-for="c in BU.caveats" :key="c">{{ c }}</li>
+          </ul>
+        </div>
+      </div>
+    </template>
+  </section>
+
+  <!-- ================= TAB: RANKING ================= -->
+  <section v-show="tab==='ranking'" class="p-5 sm:p-7">
+    <h2 class="sect">Reliability tier list</h2>
+    <p class="text-[13px] mb-4" style="color:var(--dim)">Scene consensus on how likely a board is to still be alive &mdash; not a performance ranking. Every 360 board performs identically.</p>
+    <div class="panel rounded overflow-hidden mb-8">
+      <div v-for="t in DB.tiers" :key="t.tier" class="flex items-stretch" style="border-bottom:1px solid var(--line)">
+        <div :class="'tierbox tier-'+t.tier" class="tierrail w-16 shrink-0 text-[20px]">{{ t.tier }}</div>
+        <div class="flex flex-wrap gap-2 p-3">
+          <button v-for="i in t.items" :key="i" @click="q=i.split(' ')[0]; go('codes')"
+                  class="chip px-3 py-1 rounded text-[12.5px] cursor-pointer hover:text-white">{{ i }}</button>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="sect">Detailed scoreboard</h2>
+    <div class="panel rounded overflow-hidden">
+      <div class="overflow-x-auto">
+        <table>
+          <thead><tr>
+            <th v-for="c in cols" :key="c[0]" @click="sortBy(c[0])" class="cursor-pointer select-none hover:text-white">
+              {{ c[1] }}<span v-if="sortK===c[0]" class="acc">{{ sortD>0?' ▲':' ▼' }}</span>
+            </th></tr></thead>
+          <tbody>
+            <tr v-for="s in scoreboard" :key="s.board">
+              <td class="mono" style="color:var(--dim)">{{ s.rank }}</td>
+              <td class="font-bold text-white whitespace-nowrap">{{ s.board }}</td>
+              <td style="min-width:140px">
+                <div class="flex items-center gap-2">
+                  <div class="h-1.5 rounded-full flex-1" style="background:var(--panel-2);min-width:56px">
+                    <div class="h-1.5 rounded-full" :style="{width:(s.rel*10)+'%',background:'var(--acc)',boxShadow:'0 0 8px var(--acc)'}"></div>
+                  </div>
+                  <span class="mono text-[11px] acc whitespace-nowrap">{{ s.relText }}</span>
+                </div>
+              </td>
+              <td class="text-[13px]">{{ s.why }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= TAB: MODELS ================= -->
+  <section v-show="tab==='models'" class="p-5 sm:p-7">
+    <h2 class="sect">Every Xbox 360 model</h2>
+    <p class="text-[13px] mb-3" style="color:var(--dim)">Three generations &mdash; the original "Phat" (2005), the S / "Slim" (2010) and the E (2013).</p>
+    <div class="flex flex-wrap gap-2 items-center mb-4">
+      <button v-for="g in ['All','Phat','Slim (S)','E']" :key="g" @click="genSel=g" :data-on="genSel===g?'1':'0'"
+              class="chip label px-2.5 py-1 rounded cursor-pointer">{{ g }}</button>
+      <input v-model="mq" placeholder="Filter models..." class="ml-auto px-3.5 py-2 rounded text-[13px] min-w-[170px]"
+             style="background:var(--panel-2);border:1px solid var(--line);color:var(--hi)">
+    </div>
+    <div class="panel rounded overflow-hidden mb-8">
+      <div class="overflow-x-auto">
+        <table>
+          <thead><tr><th>Gen</th><th>SKU</th><th>Years</th><th>Storage</th><th>Finish</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr v-for="m in models" :key="m.gen+m.sku">
+              <td><span class="chip px-2 py-0.5 rounded mono text-[10px] whitespace-nowrap">{{ m.gen }}</span></td>
+              <td class="font-bold text-white whitespace-nowrap">{{ m.sku }}</td>
+              <td class="mono text-[12.5px] whitespace-nowrap" style="color:var(--dim)">{{ m.years }}</td>
+              <td class="text-[12px]">{{ m.storage }}</td>
+              <td class="text-[12px]" style="color:var(--dim)">{{ m.finish }}</td>
+              <td class="text-[13px]">{{ m.notes }}</td>
+            </tr>
+            <tr v-if="!models.length"><td colspan="6" class="text-center py-8" style="color:var(--dim)">No match</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h2 class="sect">Notable limited &amp; special editions</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <article v-for="e in editions" :key="e.name" class="panel rounded p-3">
+        <h3 class="text-[14px] font-semibold text-white m-0">{{ e.name }}</h3>
+        <div class="label mb-1.5" style="color:var(--dim)">{{ e.year }} · {{ e.chassis }}</div>
+        <p class="text-[12px] m-0">{{ e.notes }}</p>
+      </article>
+    </div>
+  </section>
+
+  <footer class="px-5 sm:px-7 py-7 text-[12.5px] flex flex-wrap gap-x-4 gap-y-1 justify-between" style="color:var(--dim);border-top:1px solid var(--line-2)">
+    <span>360 Diagnostic Wiki &mdash; community reference, no warranty. Verify before you reball.</span>
+    <a href="https://github.com/nat649/ultimate-xbox360-diags" class="acc hover:underline transition-colors">Source on GitHub &#8599;</a>
+  </footer>
+
+  <div v-if="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 panel px-5 py-2.5 text-[13px] acc z-50 noprint"
+       style="box-shadow:0 0 24px rgba(0,0,0,.7)">{{ toast }}</div>
 </div>
-
-<script>
-    // Tab switching
-    var tabButtons = document.querySelectorAll('.tab-btn');
-    for (var t = 0; t < tabButtons.length; t++) {
-        tabButtons[t].addEventListener('click', function () {
-            var target = this.getAttribute('data-tab');
-            var btns = document.querySelectorAll('.tab-btn');
-            var panels = document.querySelectorAll('.tab-panel');
-            for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
-            for (var j = 0; j < panels.length; j++) panels[j].classList.remove('active');
-            this.classList.add('active');
-            document.getElementById('tab-' + target).classList.add('active');
-        });
-    }
-
-    // Classic simple filter script
-    document.getElementById('searchBox').addEventListener('input', function () {
-        var filter = this.value.toUpperCase();
-        var rows = document.querySelectorAll('#dataTable tbody tr');
-        var visible = 0;
-
-        for (var i = 0; i < rows.length; i++) {
-            if (rows[i].classList.contains('no-results')) continue;
-            var rowText = rows[i].textContent || rows[i].innerText;
-            if (rowText.toUpperCase().indexOf(filter) > -1) {
-                rows[i].style.display = "";
-                visible++;
-            } else {
-                rows[i].style.display = "none";
-            }
-        }
-
-        var nr = document.querySelector('#dataTable tbody tr.no-results');
-        if (nr) nr.style.display = visible === 0 ? "" : "none";
-    });
-</script>
-
+<script src="app.js"></script>
 </body>
 </html>
