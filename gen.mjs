@@ -24,9 +24,11 @@ const models = [
   ...gen('[Models] Xbox 360 S / "Slim" (2010 - 2013)','Slim (S)'),
   ...gen('[Models] Xbox 360 E (2013 - 2016)','E'),
 ];
-const editions = (d.named['[Info] Notable Limited & Special Editions']||[]).map(([name,year,chassis,notes])=>({name,year,chassis,notes}));
+const EB = d.editionBoards || {};
+const editions = (d.named['[Info] Notable Limited & Special Editions']||[])
+  .map(([name,year,chassis,notes])=>({name,year,chassis,notes,board:EB[name]||''}));
 
-const out = {errors: d.errors, mobos, tiers: d.tiers, score, models, editions, softmods: d.softmods};
+const out = {errors: d.errors, mobos, tiers: d.tiers, score, models, editions, softmods: d.softmods, psuConnectors: d.psuConnectors, psuNote: d.psuNote};
 fs.writeFileSync('data.js', '/* Auto-generated dataset for the 360 Diagnostic Wiki. Edit here, the UI reads it. */\nwindow.DIAGS = ' + JSON.stringify(out, null, 1) + ';\n');
 console.log('tiers assigned:', mobos.map(m=>m.name+'='+m.tier).join(', '));
 console.log('models', models.length, 'editions', editions.length, 'score', score.length);

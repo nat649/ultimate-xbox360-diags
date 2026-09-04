@@ -28,63 +28,67 @@ const E = {
   '1001': ['moderate', 'DIY', 'Drive is getting bad voltage or its PCB firmware is corrupt. Try a different SATA power lead, then dump the drive firmware. Re-flashing the original key back is often enough to bring it round.', ['E64 / E65', 'E66']],
   '1003': ['minor', 'DIY', 'Drive short. Boot with the HDD removed: if the console runs fine, the fault is the caddy connector or the drive itself. Both are cheap to replace and need no soldering.', ['1010', 'E68']],
   '1010': ['minor', 'DIY', 'Shown as E68. Pull the hard drive and boot. If it clears, format or replace the drive; if it persists with no drive attached, look at the eFUSE/NAND side instead.', ['E68', '1003']],
-  '1013': ['moderate', 'DIY', 'Dashboard update died part way through flashing. Put the full update on a FAT32 USB stick and boot with it attached. If the console will not take the update at all, the NAND blocks it writes to are failing.', ['E71 / E79', '0022']],
+  '1013': ['moderate', 'DIY', 'Verified on Falcon, Trinity and Corona: leave a USB stick with a default.xex in its root plugged in and the console throws this on the next boot. Nothing is wrong with it - pull the stick, or move the payload into a subfolder. Only if it persists with nothing attached is it a genuine half-flashed dashboard update, in which case put the full update on a FAT32 stick and boot with it attached; if it will not take the update at all, the NAND blocks it writes to are failing.', ['E71', '0022'], 'Usually a default.xex left in the root of an attached USB stick - unplug it and boot again before assuming anything is wrong. Otherwise a dashboard update that died part way through flashing.'],
   '1022': ['fatal', 'advanced', 'Shown as E74. The GPU to HANA link has degraded. Reseating or replacing the AV cable is worth thirty seconds, but on Zephyr and early Falcon this is the same underfill failure as 0102 wearing a different hat.', ['E74', '0102', 'E73']],
   '1033': ['fatal', 'pro only', 'CPU will not initialise. A donor CPU has to be paired with a matching NAND dump, which is why these boards are usually parted out rather than repaired.', ['0022', '0032']],
   'E64 / E65': ['moderate', 'advanced', 'Drive firmware OSKV does not match what the dashboard expects, almost always after a failed or mismatched firmware flash. Restore the drive original firmware with the correct key.', ['E66', '1001']],
   'E66': ['moderate', 'advanced', 'Drive model spoof failed - the dashboard expects one manufacturer and finds another. Re-spoof with the correct target model, or fit the drive the console shipped with.', ['E64 / E65', '1001']],
   'E68': ['minor', 'DIY', 'Same as secondary 1010. Remove the hard drive, boot, then reattach. A drive that only faults when warm is on its way out.', ['1010', '1003']],
-  'E71 / E79': ['moderate', 'DIY', 'Before assuming NAND damage, unplug your USB stick and boot again. A default.xex sitting in the root of a USB drive makes the dashboard try to launch it, and on an unglitched console that fails as E71 - the console is completely healthy. This is the standard BadUpdate / ABadAvatar false alarm: people leave the exploit stick plugged in after a session, reboot, and think they have bricked it. Move the payload into a subfolder or pull the stick. If E71 persists with nothing attached, then treat it as dashboard or NAND corruption: hold Sync while powering on to clear the cache, and re-apply the dashboard update from a FAT32 stick.', ['1013', '1033']],
+  'E71': ['moderate', 'DIY', 'Before assuming NAND damage, unplug your USB stick and boot again. A default.xex sitting in the root of a USB drive makes the dashboard try to launch it, and on an unglitched console that fails as E71 - the console is completely healthy. This is the standard BadUpdate / ABadAvatar false alarm: people leave the exploit stick plugged in after a session, reboot, and think they have bricked it. Move the payload into a subfolder or pull the stick. If E71 persists with nothing attached, then treat it as dashboard or NAND corruption: hold Sync while powering on to clear the cache, and re-apply the dashboard update from a FAT32 stick.', ['1013', '1033']],
   'E73': ['serious', 'advanced', 'Ethernet PHY or HANA fault. Inspect the ethernet port pins and the magnetics chip behind it - a shorted transformer here also drags power rails and can present as 0002.', ['0002', '1022']],
   'E74': ['fatal', 'pro only', 'Same failure as secondary 1022. Microsoft extended the warranty over this one for a reason: on 90 nm GPU boards it is a package failure, not a loose cable.', ['1022', '0102']]
 };
 d.errors = d.errors.map(e => {
+  if (e.code === 'E71 / E79') e = { ...e, code: 'E71' };
   const x = E[e.code];
-  return x ? { ...e, severity: x[0], difficulty: x[1], detail: x[2], related: x[3] } : e;
+  if (!x) return e;
+  const out = { ...e, severity: x[0], difficulty: x[1], detail: x[2], related: x[3] };
+  if (x[4]) out.fix = x[4];
+  return out;
 });
 
 /* ---------- motherboards ---------- */
 const M = {
   'Xenon': [90, 'GPU package underfill - 0102 and 0110, usually within the first two years of use.',
     'JTAG on kernel 2.0.7371 or lower; otherwise RGH1, which is still the fastest and most reliable glitch on Xenon.', true,
-    { CPU: 'Waternoose, 90nm', GPU: 'Xenos 90nm + separate 90nm eDRAM die', NAND: '16 MB', DVD: 'Samsung MS25, Hitachi GDR-3120L, BenQ VAD6038' }, ['0102', '0110', '0100', '0020']],
+    { CPU: 'Waternoose, 90nm', GPU: 'Xenos 90nm + separate 90nm eDRAM die', NAND: '16 MB', DVD: 'Samsung MS25, Hitachi GDR-3120L, BenQ VAD6038' }, ['0102', '0110', '0100', '0020'], 'No HDMI port and a 203W (16.5A) brick. Everything from launch to mid-2006. If it has HDMI it is not a Xenon.'],
   'Zephyr': [80, 'E74 / 1022 on the GPU-HANA link, plus the same 0102 underfill failure as Xenon.',
     'JTAG on 7371 or lower, otherwise RGH2. Same glitch points as Falcon.', true,
-    { CPU: 'Waternoose, 90nm', GPU: 'Xenos 90nm, HANA scaler added', NAND: '16 MB', DVD: 'Hitachi GDR-3120L (78/79), BenQ VAD6038' }, ['1022', 'E74', '0102', 'E73']],
+    { CPU: 'Waternoose, 90nm', GPU: 'Xenos 90nm, HANA scaler added', NAND: '16 MB', DVD: 'Hitachi GDR-3120L (78/79), BenQ VAD6038' }, ['1022', 'E74', '0102', 'E73'], 'HDMI plus a 203W (16.5A) brick - that pairing is Zephyr and nothing else. Dated late 2006 to mid-2007.'],
   'Early Falcon': [55, 'E74. The cooler 65 nm CPU kept the board alive long enough for the 90 nm GPU link to fail instead.',
     'JTAG on 7371 or lower, otherwise RGH2 - Falcon is the textbook RGH2 target and glitches quickly.', true,
-    { CPU: 'Falcon, 65nm', GPU: 'Xenos 90nm', NAND: '16 MB', DVD: 'BenQ VAD6038, Lite-On DG-16D2S' }, ['E74', '1022', '0102']],
+    { CPU: 'Falcon, 65nm', GPU: 'Xenos 90nm', NAND: '16 MB', DVD: 'BenQ VAD6038, Lite-On DG-16D2S' }, ['E74', '1022', '0102'], 'HDMI with a 175W (14.2A) brick, made late 2007 to around mid-2008. The date on the rear sticker is what separates it from the v2.'],
   'Late Falcon (v2)': [25, 'Rarely the GPU any more - expect DVD laser wear and dried thermal paste instead.',
     'JTAG if the dashboard was never updated past 7371, otherwise RGH2.', true,
-    { CPU: 'Falcon, 65nm', GPU: 'Rhea 80nm, high-TG underfill', NAND: '16 MB', DVD: 'BenQ VAD6038, Lite-On DG-16D2S' }, ['0011', '1001']],
+    { CPU: 'Falcon, 65nm', GPU: 'Rhea 80nm, high-TG underfill', NAND: '16 MB', DVD: 'BenQ VAD6038, Lite-On DG-16D2S' }, ['0011', '1001'], 'Externally identical to an early Falcon - same brick, same ports. Only the manufacture date tells them apart: mid to late 2008. Opened up, the GPU die is visibly smaller than the 90nm part.'],
   'Opus': [30, 'Inherits Falcon behaviour. No HDMI, so a dying AV port is the more common annoyance.',
     'JTAG / RGH2 exactly like Falcon. Popular donor board for repairs of Xenon shells.', true,
-    { CPU: 'Falcon, 65nm', GPU: '80nm', NAND: '16 MB', DVD: 'BenQ VAD6038, Lite-On DG-16D2S' }, ['0011', '0021']],
+    { CPU: 'Falcon, 65nm', GPU: '80nm', NAND: '16 MB', DVD: 'BenQ VAD6038, Lite-On DG-16D2S' }, ['0011', '0021'], 'A 175W (14.2A) brick with no HDMI port. Nothing else ships that combination, so it is unmistakable from the back panel alone.'],
   'Jasper': [15, 'Very little. Failures are usually the DVD drive, the PSU or an abused HDD rather than the board.',
     'JTAG if still on 7371 or lower - Jasper is the most sought-after JTAG board. Otherwise RGH2. Big-block 256/512 MB NAND needs a programmer that supports it.', true,
-    { CPU: 'Jasper, 65nm', GPU: '65nm', NAND: '16 MB, or 256/512 MB internal on Arcade', DVD: 'Lite-On DG-16D2S, BenQ VAD6038' }, ['0022', '1033', '1001']],
+    { CPU: 'Jasper, 65nm', GPU: '65nm', NAND: '16 MB, or 256/512 MB internal on Arcade', DVD: 'Lite-On DG-16D2S, BenQ VAD6038' }, ['0022', '1033', '1001'], 'HDMI with a 150W (12.1A) brick, late 2008 onward. Arcade units report 256 MB or 512 MB of internal storage in the dashboard storage settings.'],
   'Tonasket (Kronos)': [10, 'Effectively nothing structural. Fans and optical drives wear out first.',
     'Shipped late enough that JTAG is rare; RGH2 is the practical route.', true,
-    { CPU: 'Jasper, 65nm', GPU: '65nm with 65nm eDRAM', NAND: '16 MB / 256 MB', DVD: 'Lite-On DG-16D2S' }, ['1001', '1003']],
+    { CPU: 'Jasper, 65nm', GPU: '65nm with 65nm eDRAM', NAND: '16 MB / 256 MB', DVD: 'Lite-On DG-16D2S' }, ['1001', '1003'], 'Same 150W brick and the same ports as a Jasper - the manufacture date is the only outside tell, late 2009 into 2010.'],
   'Trinity': [12, 'One red light rather than a ring on Slims. Dust-choked heatsink and a tired DVD laser are the common causes.',
     'RGH1.2 or RGH2 - Trinity is the standard Slim glitch target and boots fast.', true,
-    { CGPU: 'Vejle 45nm, CPU+GPU+eDRAM on one die', NAND: '16 MB, or 4 GB eMMC on the 4 GB SKU', DVD: 'Lite-On DG-16D4S' }, ['1033', '0101', '0022']],
+    { CGPU: 'Vejle 45nm, CPU+GPU+eDRAM on one die', NAND: '16 MB, or 4 GB eMMC on the 4 GB SKU', DVD: 'Lite-On DG-16D4S' }, ['1033', '0101', '0022'], 'The glossy Xbox 360 S chassis with the touch-sensitive power button, made 2010 into 2011. Every early S is a Trinity; from late 2011 they start being Corona.'],
   'Corona (V1 - V6)': [20, 'Southbridge failures and dead 4 GB eMMC modules. A Corona that will not hold a dashboard update usually has a failing eMMC.',
     'RGH3 on V1-V5 gives the fastest boots of any 360. V6 rewired the eMMC and needs the dedicated V6 method or an eMMC adapter - or skip the soldering entirely and use BadUpdate.', true,
-    { CGPU: '45nm', NAND: '16 MB, or 4 GB eMMC', DVD: 'Lite-On DG-16D5S (FW 0225 / 1175)' }, ['0101', '0022', '1033']],
+    { CGPU: '45nm', NAND: '16 MB, or 4 GB eMMC', DVD: 'Lite-On DG-16D5S (FW 0225 / 1175)' }, ['0101', '0022', '1033'], 'An S from late 2011 on, any E before the Winchester run, or anything with 4 GB of soldered eMMC. Corona folded the HANA into the Southbridge, so opened up there is no separate scaler chip beside the CGPU.'],
   'Winchester': [5, 'Nothing notable. The most reliable board Microsoft shipped.',
     'No public glitch exists for Winchester - not JTAG-able, not RGH-able. BadUpdate is the only route in, and it needs the console to be sitting on dashboard 17559.', false,
-    { CGPU: '45nm, no IHS', NAND: '4 GB eMMC', DVD: 'Lite-On DG-16D5S' }, ['1003', '1001']]
+    { CGPU: '45nm, no IHS', NAND: '4 GB eMMC', DVD: 'Lite-On DG-16D5S' }, ['1003', '1001'], 'An Xbox 360 E made from 2014 on. Opened up it is unmistakable: the CGPU has no metal heat spreader, just bare silicon under the heatsink.']
 };
 d.mobos = d.mobos.map(m => {
   const x = M[m.name];
   if (!x) return m;
-  return { ...m, risk: x[0], faults: x[1], mod: x[2], glitchable: x[3], stats: { ...m.stats, ...x[4] }, codes: x[5] };
+  return { ...m, risk: x[0], faults: x[1], mod: x[2], glitchable: x[3], stats: { ...m.stats, ...x[4] }, codes: x[5], ident: x[6] };
 });
 
 /* ---------- softmod / glitch compatibility ---------- */
 const C = {
-  'Xenon':            ['Yes - kernel 2.0.7371 or lower', 'RGH1 (best on Xenon)', 'Yes (dash 17559)'],
+  'Xenon':            ['Yes - kernel 2.0.7371 or lower', 'RGH1 (best on Xenon)', 'Yes (dash 17559)', 'An Xbox 360 E made from 2014 on. Opened up it is unmistakable: the CGPU has no metal heat spreader, just bare silicon under the heatsink.'],
   'Zephyr':           ['Yes - 7371 or lower', 'RGH2', 'Yes (dash 17559)'],
   'Early Falcon':     ['Yes - 7371 or lower', 'RGH2', 'Yes (dash 17559)'],
   'Late Falcon (v2)': ['Yes - 7371 or lower', 'RGH2', 'Yes (dash 17559)'],
@@ -145,6 +149,38 @@ if (d.named && d.named[EDKEY]) {
       '320 GB Xbox 360 S in a custom dark finish with MW3 branding, shipped with two matching wireless controllers and a wired headset. Notable for replacing the console’s own power-on and eject sounds with MW3 audio — one of the very few bundles that changed the hardware’s UI sounds rather than just its paint.']);
   }
 }
+
+/* ---------- probable motherboard behind each limited edition ---------- */
+d.editionBoards = {
+  'Halo 3 Special Edition': 'Zephyr - late stock may be an early Falcon',
+  'The Simpsons Movie': 'Zephyr',
+  'Resident Evil 5': 'Jasper',
+  'Modern Warfare 2': 'Jasper',
+  'Final Fantasy XIII (Lightning Edition)': 'Jasper, late units Tonasket',
+  'Special Edition Blue': 'Jasper or Tonasket (Kronos)',
+  'Halo: Reach': 'Trinity',
+  'Gears of War 3': 'Trinity',
+  'Star Wars: The Old Republic / Battlefield 3': 'Trinity',
+  'Call of Duty: Modern Warfare 3 Limited Edition': 'Trinity - late stock may be Corona',
+  'Kinect Star Wars (R2-D2 / C-3PO)': 'Corona',
+  'Halo 4': 'Corona',
+  'Chrome Series (Red / Blue / Silver)': 'Corona',
+  'GTA V': 'Corona',
+  'Forza Horizon 2 / Sunset Overdrive era': 'Winchester'
+};
+
+/* ---------- phat power connectors ----------
+   The three generations are physically keyed differently, so the plug itself
+   identifies the board even with the label rubbed off. */
+d.psuConnectors = [
+  { watts: '203W', amps: '12V / 16.5A', boards: 'Xenon, Zephyr',
+    note: 'The launch brick, and the only one those two boards accept.' },
+  { watts: '175W', amps: '12V / 14.2A', boards: 'Opus, Early and Late Falcon',
+    note: 'Arrived with the 65nm CPU, and reused for the Opus warranty boards.' },
+  { watts: '150W', amps: '12V / 12.1A', boards: 'Jasper, Tonasket (Kronos)',
+    note: 'The final phat brick, from the 65nm GPU shrink onward.' }
+];
+d.psuNote = 'The three phat generations use differently keyed connectors and are not freely interchangeable - match the wattage printed on the brick to the board rather than assuming a plug that physically enters is the right one. Slim and E consoles use a smaller connector of their own, so there is no crossover with the phats at all.';
 
 fs.writeFileSync('data.json', JSON.stringify(d, null, 1));
 console.log('enriched errors:', d.errors.filter(e => e.detail).length, '/', d.errors.length);
