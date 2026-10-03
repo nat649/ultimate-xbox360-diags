@@ -1,4 +1,5 @@
-/* Auto-generated dataset for the 360 Diagnostic Wiki. Edit here, the UI reads it. */
+/* The 360 Diagnostic Wiki dataset. This file is the source of truth: edit it directly, the UI reads it.
+   Run `python3 tools/validate.py` after editing. See CONTRIBUTING.md for the schema. */
 window.DIAGS = {
  "errors": [
   {
@@ -451,7 +452,19 @@ window.DIAGS = {
     "rgh": "RGH1 (best on Xenon)",
     "badupdate": "Yes (dash 17559)"
    },
-   "tier": "F"
+   "tier": "F",
+   "slug": "xenon",
+   "id": {
+    "chassis": [
+     "Phat"
+    ],
+    "hdmi": false,
+    "watts": [
+     203
+    ],
+    "dateFrom": "2005-11",
+    "dateTo": "2006-12"
+   }
   },
   {
    "name": "Zephyr",
@@ -483,7 +496,19 @@ window.DIAGS = {
     "rgh": "RGH2",
     "badupdate": "Yes (dash 17559)"
    },
-   "tier": "F"
+   "tier": "F",
+   "slug": "zephyr",
+   "id": {
+    "chassis": [
+     "Phat"
+    ],
+    "hdmi": true,
+    "watts": [
+     203
+    ],
+    "dateFrom": "2006-09",
+    "dateTo": "2007-08"
+   }
   },
   {
    "name": "Early Falcon",
@@ -514,7 +539,19 @@ window.DIAGS = {
     "rgh": "RGH2",
     "badupdate": "Yes (dash 17559)"
    },
-   "tier": "C"
+   "tier": "C",
+   "slug": "early-falcon",
+   "id": {
+    "chassis": [
+     "Phat"
+    ],
+    "hdmi": true,
+    "watts": [
+     175
+    ],
+    "dateFrom": "2007-08",
+    "dateTo": "2008-06"
+   }
   },
   {
    "name": "Late Falcon (v2)",
@@ -544,7 +581,19 @@ window.DIAGS = {
     "rgh": "RGH2",
     "badupdate": "Yes (dash 17559)"
    },
-   "tier": "A"
+   "tier": "A",
+   "slug": "late-falcon-v2",
+   "id": {
+    "chassis": [
+     "Phat"
+    ],
+    "hdmi": true,
+    "watts": [
+     175
+    ],
+    "dateFrom": "2008-05",
+    "dateTo": "2008-12"
+   }
   },
   {
    "name": "Opus",
@@ -574,7 +623,19 @@ window.DIAGS = {
     "rgh": "RGH2",
     "badupdate": "Yes (dash 17559)"
    },
-   "tier": "B"
+   "tier": "B",
+   "slug": "opus",
+   "id": {
+    "chassis": [
+     "Phat"
+    ],
+    "hdmi": false,
+    "watts": [
+     175
+    ],
+    "dateFrom": "2008-01",
+    "dateTo": "2009-12"
+   }
   },
   {
    "name": "Jasper",
@@ -605,7 +666,19 @@ window.DIAGS = {
     "rgh": "RGH2",
     "badupdate": "Yes (dash 17559)"
    },
-   "tier": "S"
+   "tier": "S",
+   "slug": "jasper",
+   "id": {
+    "chassis": [
+     "Phat"
+    ],
+    "hdmi": true,
+    "watts": [
+     150
+    ],
+    "dateFrom": "2008-09",
+    "dateTo": "2009-12"
+   }
   },
   {
    "name": "Tonasket (Kronos)",
@@ -635,7 +708,19 @@ window.DIAGS = {
     "rgh": "RGH2",
     "badupdate": "Yes (dash 17559)"
    },
-   "tier": "S+"
+   "tier": "S+",
+   "slug": "tonasket-kronos",
+   "id": {
+    "chassis": [
+     "Phat"
+    ],
+    "hdmi": true,
+    "watts": [
+     150
+    ],
+    "dateFrom": "2009-09",
+    "dateTo": "2010-08"
+   }
   },
   {
    "name": "Trinity",
@@ -665,7 +750,19 @@ window.DIAGS = {
     "rgh": "RGH1.2 / RGH2",
     "badupdate": "Yes (dash 17559)"
    },
-   "tier": "S"
+   "tier": "S",
+   "slug": "trinity",
+   "id": {
+    "chassis": [
+     "Slim (S)"
+    ],
+    "hdmi": true,
+    "watts": [
+     135
+    ],
+    "dateFrom": "2010-06",
+    "dateTo": "2011-12"
+   }
   },
   {
    "name": "Corona (V1 - V6)",
@@ -695,7 +792,21 @@ window.DIAGS = {
     "rgh": "RGH3 (V1-V5) / V6 needs the eMMC method",
     "badupdate": "Yes (dash 17559)"
    },
-   "tier": "A"
+   "tier": "A",
+   "slug": "corona-v1-v6",
+   "id": {
+    "chassis": [
+     "Slim (S)",
+     "E"
+    ],
+    "hdmi": true,
+    "watts": [
+     120,
+     115
+    ],
+    "dateFrom": "2011-08",
+    "dateTo": "2013-12"
+   }
   },
   {
    "name": "Winchester",
@@ -724,7 +835,19 @@ window.DIAGS = {
     "rgh": "None - no public glitch exists",
     "badupdate": "Yes - the only way in (17559)"
    },
-   "tier": "S+"
+   "tier": "S+",
+   "slug": "winchester",
+   "id": {
+    "chassis": [
+     "E"
+    ],
+    "hdmi": true,
+    "watts": [
+     115
+    ],
+    "dateFrom": "2014-01",
+    "dateTo": "2016-04"
+   }
   }
  ],
  "tiers": [
@@ -1130,5 +1253,773 @@ window.DIAGS = {
    "note": "The final phat brick, from the 65nm GPU shrink onward."
   }
  ],
- "psuNote": "The three phat generations use differently keyed connectors and are not freely interchangeable - match the wattage printed on the brick to the board rather than assuming a plug that physically enters is the right one. Slim and E consoles use a smaller connector of their own, so there is no crossover with the phats at all."
+ "psuNote": "The three phat generations use differently keyed connectors and are not freely interchangeable - match the wattage printed on the brick to the board rather than assuming a plug that physically enters is the right one. Slim and E consoles use a smaller connector of their own, so there is no crossover with the phats at all.",
+ "meta": {
+  "updated": "2026-10-03",
+  "repo": "https://github.com/nat649/ultimate-xbox360-diags"
+ },
+ "primary": [
+  {
+   "chassis": "Phat",
+   "lights": 1,
+   "title": "Hardware error, E-code on screen",
+   "meaning": "One red quadrant means the console caught a hardware error and printed an E-code on the TV (E74, E68, E71...).",
+   "action": "Read the E-code off the screen and convert it in the E-code converter below. It is the same number as the secondary code, just in base 10.",
+   "route": "decoder"
+  },
+  {
+   "chassis": "Phat",
+   "lights": 2,
+   "title": "Overheating",
+   "meaning": "Two red quadrants is thermal protection. The console shut itself down to stop the CPU or GPU cooking.",
+   "action": "Power off, let it cool for 30 minutes, give it space on all sides and blow the dust out of the intake. If it comes back after cleaning, check the fans and repaste.",
+   "route": "troubleshoot/heat"
+  },
+  {
+   "chassis": "Phat",
+   "lights": 3,
+   "title": "General hardware failure (the RROD)",
+   "meaning": "Three red quadrants is the classic Red Ring of Death. Something failed the boot self-test, and the secondary code says what.",
+   "action": "Read the secondary code (hold Sync, tap Eject four times) and enter it in the decoder. Do not guess, and do not towel-trick it.",
+   "route": "decoder"
+  },
+  {
+   "chassis": "Phat",
+   "lights": 4,
+   "title": "No AV cable detected",
+   "meaning": "Four red quadrants means the console cannot see an AV cable.",
+   "action": "Reseat or swap the AV cable and look into the AV port for bent pins. HDMI-equipped boards also boot fine with only an HDMI cable.",
+   "route": "troubleshoot/novideo"
+  },
+  {
+   "chassis": "Slim (S)",
+   "lights": 0,
+   "title": "Red power light",
+   "meaning": "The S has no ring. A red light on the power button with no E-code is the overheat cut-out; with an E-code on screen it is a hardware error.",
+   "action": "If there is an E-code, convert it below. If not, treat it as overheating: cool down, clear the vents, check the fan.",
+   "route": "troubleshoot/slimred"
+  },
+  {
+   "chassis": "E",
+   "lights": 0,
+   "title": "Flashing / coloured power light",
+   "meaning": "The E reports faults on the TV rather than with lights. A power light that flashes and shuts off is usually thermal protection.",
+   "action": "Check the TV for an E-code first; otherwise follow the overheating path.",
+   "route": "troubleshoot/slimred"
+  }
+ ],
+ "brick": [
+  {
+   "led": "Off",
+   "color": "#3a4148",
+   "meaning": "No mains power is reaching the brick, or the brick is dead.",
+   "action": "Try another wall socket and the mains cable from a known-good brick. Still dark: replace the brick with the correct wattage for your board."
+  },
+  {
+   "led": "Orange",
+   "color": "#f0ad3c",
+   "meaning": "Standby. The brick is healthy and waiting for the console to ask for power.",
+   "action": "Normal when the console is off. If it stays orange when you press power, the problem is the console power button or board, not the brick."
+  },
+  {
+   "led": "Green",
+   "color": "#7fc45a",
+   "meaning": "Delivering 12 V. The console is on.",
+   "action": "Normal. If the console still shows no lights, the fault is on the console side."
+  },
+  {
+   "led": "Red",
+   "color": "#f2604f",
+   "meaning": "Protection. The brick sees a short, an overload or its own overheating.",
+   "action": "Unplug the DC lead from the console. If the brick returns to orange, the short is in the console (see 0001). If it stays red after 30 minutes of cooling, the brick has failed."
+  }
+ ],
+ "tools": {
+  "DIY": [
+   "T8 and T10 Torx drivers",
+   "Plastic pry tools",
+   "Compressed air",
+   "99% isopropyl alcohol",
+   "Thermal paste"
+  ],
+  "advanced": [
+   "Multimeter",
+   "Temperature-controlled soldering iron",
+   "Flux and desoldering braid",
+   "Hot air station",
+   "Kapton tape"
+  ],
+  "pro only": [
+   "BGA rework station with bottom preheater",
+   "Reballing stencils and solder balls",
+   "Microscope or loupe",
+   "Known-good donor parts"
+  ]
+ },
+ "flows": {
+  "start": {
+   "q": "What is the console doing?",
+   "options": [
+    {
+     "label": "Nothing at all, no lights",
+     "next": "nopower"
+    },
+    {
+     "label": "Red lights on the ring (original Phat)",
+     "next": "redring"
+    },
+    {
+     "label": "Red light on the power button (S / E)",
+     "next": "slimred"
+    },
+    {
+     "label": "Powers on but no picture",
+     "next": "novideo"
+    },
+    {
+     "label": "An E-code on the TV (E68, E74...)",
+     "next": "ecode"
+    },
+    {
+     "label": "Freezes, artifacts or crashes",
+     "next": "freeze"
+    },
+    {
+     "label": "Disc or tray problems",
+     "next": "disc"
+    },
+    {
+     "label": "Very loud fan or very hot",
+     "next": "heat"
+    }
+   ]
+  },
+  "nopower": {
+   "q": "Look at the LED on the power brick. What colour is it?",
+   "options": [
+    {
+     "label": "Off",
+     "next": "brickoff"
+    },
+    {
+     "label": "Orange, and it stays orange when I press power",
+     "next": "orangestays"
+    },
+    {
+     "label": "Red",
+     "next": "brickred"
+    },
+    {
+     "label": "Green, but the console shows nothing",
+     "next": "greennothing"
+    }
+   ]
+  },
+  "brickoff": {
+   "title": "No power reaching the brick",
+   "result": "Try a different wall socket and swap the mains (figure-8 / kettle) cable. If the LED is still dark with a known-good cable and socket, the brick is dead. Replace it with the wattage your board expects: the connectors are keyed per generation.",
+   "links": [
+    {
+     "label": "Power brick by generation",
+     "route": "boards"
+    },
+    {
+     "label": "Brick LED meanings",
+     "route": "decoder"
+    }
+   ]
+  },
+  "orangestays": {
+   "title": "The brick is fine, the console is not asking for power",
+   "result": "Orange is healthy standby. Try powering on from the controller Guide button or the eject button. On a Phat, check the RF module board and its ribbon; on an S, the capacitive power button misbehaves with dirt or a damaged flex. If nothing responds at all, the fault is on the standby side of the board (SMC / Southbridge).",
+   "links": [
+    {
+     "label": "Southbridge codes",
+     "route": "codes?q=SB"
+    }
+   ]
+  },
+  "brickred": {
+   "title": "Brick in protection mode",
+   "result": "Unplug the DC lead from the console. If the LED returns to orange, the console is pulling a short on the 12 V rail; the board needs diagnosing. If it stays red even after 30 minutes of cooling in open air, the brick itself has failed.",
+   "links": [
+    {
+     "label": "0001 - 12 V short",
+     "route": "codes/0001"
+    },
+    {
+     "label": "0002 - CPU Vcore",
+     "route": "codes/0002"
+    }
+   ]
+  },
+  "greennothing": {
+   "title": "12 V is there, the console is silent",
+   "result": "The brick is delivering power but nothing boots. Watch the ring or power light closely: a brief red flash means it is failing the self-test, so follow the red light path. Completely dead with a green brick usually means a board fault around the power button or standby rails.",
+   "links": [
+    {
+     "label": "Red ring path",
+     "route": "troubleshoot/redring"
+    }
+   ]
+  },
+  "redring": {
+   "q": "How many quadrants are lit red?",
+   "options": [
+    {
+     "label": "One",
+     "next": "r1"
+    },
+    {
+     "label": "Two",
+     "next": "heat"
+    },
+    {
+     "label": "Three (the RROD)",
+     "next": "r3"
+    },
+    {
+     "label": "Four",
+     "next": "r4"
+    }
+   ]
+  },
+  "r1": {
+   "title": "Hardware error with an E-code",
+   "result": "One red light comes with an E-code on the TV. Write it down and convert it: the E-code is just the secondary code written in base 10 (E74 = 1022).",
+   "links": [
+    {
+     "label": "Open the E-code converter",
+     "route": "decoder"
+    },
+    {
+     "label": "E74",
+     "route": "codes/E74"
+    },
+    {
+     "label": "E68",
+     "route": "codes/E68"
+    }
+   ]
+  },
+  "r3": {
+   "title": "Red Ring of Death",
+   "result": "Three red lights is a general hardware failure. Read the secondary code before anything else: hold Sync, tap Eject four times, and count the lit quadrants for each digit. The decoder tells you which part failed. Do not towel-trick or blind-reflow it.",
+   "links": [
+    {
+     "label": "Open the decoder",
+     "route": "decoder"
+    },
+    {
+     "label": "Guided reading",
+     "route": "decoder?guide=1"
+    }
+   ]
+  },
+  "r4": {
+   "title": "No AV cable detected",
+   "result": "Reseat the AV cable or try another one, and look into the AV port with a torch for bent or pushed-in pins. On HDMI boards try HDMI alone. If several known-good cables all give four lights, the AV port or the HANA scaler is suspect.",
+   "links": [
+    {
+     "label": "HANA codes",
+     "route": "codes?q=HANA"
+    }
+   ]
+  },
+  "slimred": {
+   "q": "Is there an E-code on the TV?",
+   "options": [
+    {
+     "label": "Yes, there is an E-code",
+     "next": "ecode"
+    },
+    {
+     "label": "No E-code, it shuts off by itself",
+     "next": "heat"
+    }
+   ]
+  },
+  "novideo": {
+   "q": "What do the console lights show?",
+   "options": [
+    {
+     "label": "Normal green lights, black screen",
+     "next": "novid_green"
+    },
+    {
+     "label": "Red lights",
+     "next": "redring"
+    }
+   ]
+  },
+  "novid_green": {
+   "title": "Console running, nothing on the TV",
+   "result": "Usually the cable or the display mode. Try another cable and TV input. With a component cable on a Phat, the switch on the plug picks HDTV or TV. If the console was set to a resolution the TV cannot show, connect a composite cable to get a picture and reset the display settings. Still black on every cable with green lights means the video path (HANA / ANA scaler) is suspect.",
+   "links": [
+    {
+     "label": "HANA codes",
+     "route": "codes?q=HANA"
+    }
+   ]
+  },
+  "ecode": {
+   "title": "Convert the E-code",
+   "result": "The E-code is the secondary code in base 10. Convert it and look it up: E74 is 1022 (eDRAM / HANA), E68 is 1010 (HDD), E71 is 1013, E73 is 1021.",
+   "links": [
+    {
+     "label": "E-code converter",
+     "route": "decoder"
+    },
+    {
+     "label": "E74",
+     "route": "codes/E74"
+    },
+    {
+     "label": "E68",
+     "route": "codes/E68"
+    },
+    {
+     "label": "E73",
+     "route": "codes/E73"
+    }
+   ]
+  },
+  "freeze": {
+   "q": "When does it freeze?",
+   "options": [
+    {
+     "label": "In every game once warm, often with checkerboard or artifacts",
+     "next": "freeze_gpu"
+    },
+    {
+     "label": "Only with one particular disc",
+     "next": "disc"
+    },
+    {
+     "label": "Randomly, even on the dashboard, with a hard drive attached",
+     "next": "freeze_hdd"
+    },
+    {
+     "label": "After 10 to 30 minutes, with the fan screaming",
+     "next": "heat"
+    }
+   ]
+  },
+  "freeze_gpu": {
+   "title": "GPU or memory joints",
+   "result": "Artifacts plus warm-up freezes point at the GPU BGA or the memory chips. On 90nm boards this is the underfill failure behind 0102 and 0110. A reflow buys weeks, a proper reball buys years, and the board revision decides whether it is worth either.",
+   "links": [
+    {
+     "label": "0102",
+     "route": "codes/0102"
+    },
+    {
+     "label": "0110",
+     "route": "codes/0110"
+    },
+    {
+     "label": "Which board do I have?",
+     "route": "identify"
+    }
+   ]
+  },
+  "freeze_hdd": {
+   "title": "Hard drive",
+   "result": "Remove the hard drive and run from a memory unit or USB stick. If the freezes stop, the drive is failing. Back up what you can and replace it.",
+   "links": [
+    {
+     "label": "E68 - HDD",
+     "route": "codes/E68"
+    }
+   ]
+  },
+  "disc": {
+   "q": "What does the drive do?",
+   "options": [
+    {
+     "label": "The tray will not open or close",
+     "next": "tray"
+    },
+    {
+     "label": "Plays DVDs but not games, or says unreadable disc / open tray",
+     "next": "laser"
+    }
+   ]
+  },
+  "tray": {
+   "title": "Worn tray belt",
+   "result": "The rubber belt that drives the tray stretches and slips. Replacing it is a cheap DIY fix on BenQ and Lite-On drives. While it is open, check the eject button contact and the tray gear.",
+   "links": [
+    {
+     "label": "DVD codes",
+     "route": "codes?q=DVD"
+    }
+   ]
+  },
+  "laser": {
+   "title": "Weak or dirty laser",
+   "result": "Clean the lens with 99% isopropyl alcohol first. If it still fails, replace the laser unit, not the whole drive: the drive is paired to the motherboard by its DVD key, so a swapped drive will not read games without the key being transferred.",
+   "links": [
+    {
+     "label": "DVD codes",
+     "route": "codes?q=DVD"
+    },
+    {
+     "label": "DVD key",
+     "route": "reference/dvd-key"
+    }
+   ]
+  },
+  "heat": {
+   "title": "Overheating",
+   "result": "Let it cool for 30 minutes. Give it at least 10 cm of clearance on every side, never run it on carpet or in a closed cabinet, and blow the dust out of the intake and heatsinks. If it still overheats, check that every fan spins, then replace the thermal paste. On Phats, do not tighten the X-clamps further: it bends the board.",
+   "links": [
+    {
+     "label": "Thermal codes",
+     "route": "codes?q=Thermal"
+    },
+    {
+     "label": "X-clamp",
+     "route": "reference/x-clamp"
+    }
+   ]
+  }
+ },
+ "glossary": [
+  {
+   "term": "RROD",
+   "slug": "rrod",
+   "def": "Red Ring of Death. Three red quadrants on a Phat: a general hardware failure, overwhelmingly GPU-related on 90nm boards.",
+   "aka": [
+    "Red Ring of Death"
+   ],
+   "cat": "diagnosis"
+  },
+  {
+   "term": "Secondary code",
+   "slug": "secondary-code",
+   "def": "The four-digit code you read by holding Sync and tapping Eject. Each digit is 0-3, so it is the E-code written in base 4.",
+   "aka": [
+    "secondary error code"
+   ],
+   "cat": "diagnosis"
+  },
+  {
+   "term": "E-code",
+   "slug": "e-code",
+   "def": "The error number shown on the TV (E74, E68...). Same value as the secondary code, in base 10.",
+   "aka": [],
+   "cat": "diagnosis"
+  },
+  {
+   "term": "BGA",
+   "slug": "bga",
+   "def": "Ball Grid Array. Chips like the CPU, GPU and memory sit on a grid of solder balls instead of legs, which crack under repeated heat cycles.",
+   "aka": [
+    "ball grid array"
+   ],
+   "cat": "repair"
+  },
+  {
+   "term": "Reflow",
+   "slug": "reflow",
+   "def": "Heating a BGA chip until its solder balls re-melt to reconnect cracked joints. Usually temporary on a 360, because the original solder and underfill are still there.",
+   "aka": [
+    "reflowing"
+   ],
+   "cat": "repair"
+  },
+  {
+   "term": "Reball",
+   "slug": "reball",
+   "def": "Removing the chip, cleaning the pads and fitting new solder balls. The proper fix for a joint failure, but it cannot cure a failure inside the chip package.",
+   "aka": [
+    "reballing"
+   ],
+   "cat": "repair"
+  },
+  {
+   "term": "Underfill",
+   "slug": "underfill",
+   "def": "The epoxy under the GPU die. Launch 90nm GPUs used a low-Tg underfill that softens with heat, letting the bumps between die and substrate crack: a fault inside the package.",
+   "aka": [],
+   "cat": "hardware"
+  },
+  {
+   "term": "Tg",
+   "slug": "tg",
+   "def": "Glass transition temperature: where an epoxy goes from rigid to rubbery. High-Tg underfill on the 80nm Rhea GPU is a big part of why Late Falcon fixed the RROD.",
+   "aka": [
+    "glass transition"
+   ],
+   "cat": "hardware"
+  },
+  {
+   "term": "X-clamp",
+   "slug": "x-clamp",
+   "def": "The X-shaped spring clamps that hold the Phat CPU and GPU heatsinks. The old \"X-clamp fix\" swapped them for screws and washers and usually made things worse by bending the board.",
+   "aka": [
+    "X-clamps",
+    "x clamp"
+   ],
+   "cat": "repair"
+  },
+  {
+   "term": "IHS",
+   "slug": "ihs",
+   "def": "Integrated Heat Spreader: the metal lid over a processor die. Winchester is the only 360 board without one.",
+   "aka": [
+    "heat spreader"
+   ],
+   "cat": "hardware"
+  },
+  {
+   "term": "CGPU",
+   "slug": "cgpu",
+   "def": "The single 45nm chip on S and E boards that combines CPU, GPU and eDRAM (Vejle). It runs far cooler than the separate Phat chips.",
+   "aka": [
+    "Vejle"
+   ],
+   "cat": "hardware"
+  },
+  {
+   "term": "eDRAM",
+   "slug": "edram",
+   "def": "The 10 MB embedded memory die next to the GPU, used for the frame buffer. A classic E74 source on Phats.",
+   "aka": [],
+   "cat": "hardware"
+  },
+  {
+   "term": "HANA",
+   "slug": "hana",
+   "def": "The video scaler / HDMI encoder chip (ANA on the earliest boards). Corona folded it into the Southbridge.",
+   "aka": [
+    "ANA"
+   ],
+   "cat": "hardware"
+  },
+  {
+   "term": "Southbridge",
+   "slug": "southbridge",
+   "def": "The I/O hub: USB, SATA, audio, networking and the SMC all live behind it.",
+   "aka": [
+    "SB"
+   ],
+   "cat": "hardware"
+  },
+  {
+   "term": "SMC",
+   "slug": "smc",
+   "def": "System Management Controller, inside the Southbridge. Runs power sequencing, fans, temperatures and the Ring of Light. RGH 3 reprograms it.",
+   "aka": [],
+   "cat": "hardware"
+  },
+  {
+   "term": "Vcore",
+   "slug": "vcore",
+   "def": "The core voltage rail of the CPU or GPU. A shorted Vcore shows up as codes like 0002 and 0003.",
+   "aka": [],
+   "cat": "hardware"
+  },
+  {
+   "term": "NAND",
+   "slug": "nand",
+   "def": "The flash chip holding the bootloaders, keyvault and config. Always dump it twice and compare before modding.",
+   "aka": [
+    "flash"
+   ],
+   "cat": "modding"
+  },
+  {
+   "term": "Keyvault",
+   "slug": "keyvault",
+   "def": "Console-unique encrypted block in the NAND: console certificate, DVD key and more. Never share it.",
+   "aka": [
+    "KV"
+   ],
+   "cat": "modding"
+  },
+  {
+   "term": "CPU key",
+   "slug": "cpu-key",
+   "def": "A per-console key fused into the CPU, needed to decrypt the keyvault. JTAG and RGH are how you read it out.",
+   "aka": [],
+   "cat": "modding"
+  },
+  {
+   "term": "DVD key",
+   "slug": "dvd-key",
+   "def": "The key pairing a disc drive to its motherboard. Swap the drive and it will not read games until the key is transferred.",
+   "aka": [],
+   "cat": "modding"
+  },
+  {
+   "term": "eFuse",
+   "slug": "efuse",
+   "def": "One-time fuses in the CPU. Dashboard updates burn them so older, exploitable bootloaders can no longer run.",
+   "aka": [
+    "eFuses"
+   ],
+   "cat": "modding"
+  },
+  {
+   "term": "JTAG",
+   "slug": "jtag",
+   "def": "The SMC / JTAG hack: an exploit through the debug port that only works on consoles whose kernel never went past 2.0.7371.",
+   "aka": [
+    "SMC hack"
+   ],
+   "cat": "modding"
+  },
+  {
+   "term": "RGH",
+   "slug": "rgh",
+   "def": "Reset Glitch Hack. A timed pulse on the CPU reset line makes the bootloader hash check pass. RGH1 and RGH2 use a glitch chip; RGH 3 does it with the SMC alone.",
+   "aka": [
+    "RGH1",
+    "RGH2",
+    "RGH 3",
+    "reset glitch"
+   ],
+   "cat": "modding"
+  },
+  {
+   "term": "Glitch chip",
+   "slug": "glitch-chip",
+   "def": "The small CPLD board (CR4, Matrix, X360ACE...) that generates the reset pulse for RGH1 and RGH2.",
+   "aka": [
+    "CPLD"
+   ],
+   "cat": "modding"
+  },
+  {
+   "term": "BadUpdate",
+   "slug": "badupdate",
+   "def": "A software-only, non-persistent hypervisor exploit for dashboard 17559 that works on every board, Winchester included.",
+   "aka": [],
+   "cat": "modding"
+  },
+  {
+   "term": "Phat",
+   "slug": "phat",
+   "def": "The original 2005-2010 console with the four-quadrant Ring of Light.",
+   "aka": [
+    "Fat"
+   ],
+   "cat": "models"
+  },
+  {
+   "term": "Slim",
+   "slug": "slim",
+   "def": "The Xbox 360 S (2010), with a glossy or matte shell and a touch power button. Boards: Trinity, then Corona.",
+   "aka": [
+    "360 S"
+   ],
+   "cat": "models"
+  },
+  {
+   "term": "Towel trick",
+   "slug": "towel-trick",
+   "def": "Wrapping a dead console so it overheats until joints re-melt. It cooks everything else too. Do not.",
+   "aka": [],
+   "cat": "repair"
+  }
+ ],
+ "timeline": [
+  {
+   "date": "2005-11",
+   "kind": "board",
+   "label": "Xbox 360 launches on Xenon",
+   "board": "xenon"
+  },
+  {
+   "date": "2006-09",
+   "kind": "board",
+   "label": "Zephyr adds HDMI",
+   "board": "zephyr"
+  },
+  {
+   "date": "2007-07",
+   "kind": "event",
+   "label": "Microsoft extends the RROD warranty to 3 years"
+  },
+  {
+   "date": "2007-08",
+   "kind": "board",
+   "label": "Falcon: 65nm CPU, 175 W brick",
+   "board": "early-falcon"
+  },
+  {
+   "date": "2008-05",
+   "kind": "board",
+   "label": "Late Falcon: 80nm Rhea GPU, high-Tg underfill",
+   "board": "late-falcon-v2"
+  },
+  {
+   "date": "2008-09",
+   "kind": "board",
+   "label": "Jasper: 65nm GPU, 150 W brick",
+   "board": "jasper"
+  },
+  {
+   "date": "2009-08",
+   "kind": "hack",
+   "label": "Dashboard update closes the JTAG hack (needs kernel 7371 or lower)"
+  },
+  {
+   "date": "2009-09",
+   "kind": "board",
+   "label": "Tonasket / Kronos: 65nm eDRAM",
+   "board": "tonasket-kronos"
+  },
+  {
+   "date": "2010-06",
+   "kind": "board",
+   "label": "Xbox 360 S on Trinity, one-chip CGPU",
+   "board": "trinity"
+  },
+  {
+   "date": "2011-08",
+   "kind": "hack",
+   "label": "Reset Glitch Hack (RGH1) released"
+  },
+  {
+   "date": "2011-08",
+   "kind": "board",
+   "label": "Corona: HANA folded into the Southbridge",
+   "board": "corona-v1-v6"
+  },
+  {
+   "date": "2011-11",
+   "kind": "hack",
+   "label": "RGH2 brings the glitch to the Slim"
+  },
+  {
+   "date": "2013-06",
+   "kind": "board",
+   "label": "Xbox 360 E launches (Corona)",
+   "board": "corona-v1-v6"
+  },
+  {
+   "date": "2014-01",
+   "kind": "board",
+   "label": "Winchester: no IHS, coolest board",
+   "board": "winchester"
+  },
+  {
+   "date": "2016-04",
+   "kind": "event",
+   "label": "Production ends"
+  },
+  {
+   "date": "2021-11",
+   "kind": "hack",
+   "label": "RGH 3: glitch with the SMC, no chip"
+  },
+  {
+   "date": "2025-03",
+   "kind": "hack",
+   "label": "BadUpdate: software-only, every board"
+  }
+ ]
 };

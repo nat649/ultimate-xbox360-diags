@@ -2,292 +2,781 @@
 <html lang="en" data-phosphor="green">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Xbox 360 hardware reference: interactive RROD secondary error code decoder, motherboard revisions, reliability tier list, modding compatibility and every retail model.">
-<meta name="theme-color" content="#08090a">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Xbox 360 hardware reference: interactive RROD secondary error code decoder, troubleshooter, board identifier, motherboard revisions, reliability tier list, modding compatibility and every retail model.">
+<meta name="theme-color" content="#0d1013" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#f4f6f7" media="(prefers-color-scheme: light)">
 <title>360 Diagnostic Wiki - RROD Decoder, Motherboards &amp; Error Codes</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='12' fill='none' stroke='%2365b042' stroke-width='5'/%3E%3C/svg%3E">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="app.css">
+<script>
+  // apply the saved theme before first paint so there is no flash
+  try { const t = JSON.parse(localStorage.getItem('x360.theme')); if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
+        const p = JSON.parse(localStorage.getItem('x360.phosphor')); if (p) document.documentElement.dataset.phosphor = p; } catch (e) {}
+</script>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config={corePlugins:{preflight:false}}</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.27/vue.global.prod.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/7.0.0/fuse.min.js"></script>
-<script src="data.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/3.4.27/vue.global.prod.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fuse.js/7.0.0/fuse.min.js" defer></script>
+<script src="data.js" defer></script>
+<script type="module" src="js/main.js"></script>
 <style>[v-cloak]{display:none}</style>
 </head>
 <body data-scanlines="off">
-<div id="app" v-cloak class="shell max-w-[1180px] mx-auto min-h-screen">
+<div id="app" v-cloak class="shell max-w-[1180px] mx-auto min-h-screen flex flex-col">
+  <a class="skip" href="#main">Skip to content</a>
 
   <!-- ================= HEADER ================= -->
-  <header class="hdr px-5 sm:px-7 py-5 flex flex-wrap items-center justify-between gap-4">
-    <div class="flex items-center gap-3">
+  <header class="hdr noprint px-4 sm:px-7 py-4 sm:py-5 flex flex-wrap items-center justify-between gap-3">
+    <a href="#decoder" @click.prevent="go('decoder')" class="flex items-center gap-3 no-underline min-w-0">
       <svg width="40" height="40" viewBox="0 0 40 40" class="shrink-0" aria-hidden="true">
         <circle cx="20" cy="20" r="15" fill="none" stroke="var(--acc)" stroke-width="2" opacity=".3"></circle>
         <circle cx="20" cy="20" r="15" fill="none" stroke="var(--acc)" stroke-width="4" stroke-dasharray="18 76" stroke-linecap="round" transform="rotate(-90 20 20)"></circle>
         <circle cx="20" cy="20" r="5" fill="var(--acc)" opacity=".85"></circle>
       </svg>
-      <div>
-        <h1 class="text-[21px] sm:text-[26px] font-semibold acc leading-tight m-0 tracking-[-0.02em]">The &ldquo;ultimate&rdquo; Xbox&nbsp;360 diags</h1>
-        <div class="text-[12.5px] mt-0.5" style="color:var(--dim)">RROD decoder, error codes, motherboards, softmods and every model</div>
+      <div class="min-w-0">
+        <h1 class="text-[20px] sm:text-[25px] font-semibold acc leading-tight m-0 tracking-[-0.02em]">The &ldquo;ultimate&rdquo; Xbox&nbsp;360 diags</h1>
+        <div class="text-[12.5px] mt-0.5 dim hidden sm:block">{{ DB.errors.length }} error codes · {{ DB.mobos.length }} boards · {{ DB.models.length }} models · updated {{ DB.meta.updated }}</div>
       </div>
-    </div>
-    <div class="flex items-center gap-2 noprint">
-      <button v-for="p in phosphors" :key="p.id" @click="setPhosphor(p.id)"
-        class="w-5 h-5 rounded-full cursor-pointer"
-        :style="{background:p.c, border:'1px solid '+(phosphor===p.id?'#fff':'transparent'), boxShadow: phosphor===p.id ? '0 0 8px '+p.c : 'none'}"
-        :title="'Phosphor: '+p.id" :aria-label="'Phosphor '+p.id"></button>
-      <button @click="toggleScan" class="chip label px-2 py-1 rounded cursor-pointer" :data-on="scan?'1':'0'" title="Toggle CRT scanlines">CRT</button>
+    </a>
+    <div class="flex items-center gap-2">
+      <button @click="openPalette" class="search-btn" aria-label="Search everything">
+        <icon n="search" :s="15"></icon><span class="hidden sm:inline">Search</span>
+        <kbd class="hidden sm:inline">Ctrl K</kbd>
+      </button>
+      <span v-if="!online" class="chip label px-2 py-1" title="You are offline">Offline</span>
+      <span v-else-if="offlineReady" class="chip label px-2 py-1 hidden md:inline-block" title="Cached on this device: works without a connection">Works offline</span>
+      <button @click="cycleTheme" class="icon-btn" :aria-label="'Theme: ' + S.theme + '. Click to change'" :title="'Theme: ' + S.theme">
+        <icon :n="S.theme === 'light' ? 'sun' : S.theme === 'dark' ? 'moon' : 'auto'"></icon>
+      </button>
+      <div class="flex items-center gap-1.5" role="group" aria-label="Accent colour">
+        <button v-for="p in phosphors" :key="p.id" @click="setPhosphor(p.id)" class="swatch"
+          :style="{ '--c': p.c }" :data-on="S.phosphor === p.id ? '1' : '0'" :aria-pressed="S.phosphor === p.id"
+          :title="'Accent: ' + p.id" :aria-label="'Accent colour ' + p.id"></button>
+      </div>
+      <button @click="S.scan = !S.scan" class="chip label px-2 py-1 hidden sm:inline-block" :data-on="S.scan ? '1' : '0'" :aria-pressed="S.scan" title="Toggle CRT scanlines">CRT</button>
     </div>
   </header>
 
-  <!-- ================= TABS ================= -->
-  <nav class="navbar flex flex-wrap sticky top-0 z-40 noprint px-2 sm:px-4" role="tablist">
-    <button v-for="t in tabs" :key="t.id" @click="go(t.id)" :data-on="tab===t.id?'1':'0'" role="tab"
-      class="tab text-[13px] font-medium px-3.5 sm:px-4 py-3.5 cursor-pointer bg-transparent"
-      >
-      {{ t.label }} <span v-if="t.count" class="opacity-50">{{ t.count }}</span>
-    </button>
-    <div class="ml-auto hidden md:flex items-center pr-3 text-[11.5px]" style="color:var(--dim)">
-      <kbd class="chip px-1.5 py-0.5 rounded mx-1">/</kbd> search
-      <kbd class="chip px-1.5 py-0.5 rounded mx-1">1-6</kbd> tabs
+  <!-- ================= TABS (desktop) ================= -->
+  <nav class="navbar noprint sticky top-0 z-40 hidden sm:flex" aria-label="Sections">
+    <div class="tabstrip" role="tablist">
+      <template v-for="(t, i) in TABS" :key="t.id">
+        <span v-if="i && TABS[i - 1].group !== t.group" class="tabsep" aria-hidden="true"></span>
+        <button :id="'tab-' + t.id" @click="go(t.id)" @keydown="tabKey($event, i)" role="tab"
+          :aria-selected="tab === t.id" aria-controls="main" :tabindex="tab === t.id ? 0 : -1" :data-on="tab === t.id ? '1' : '0'"
+          class="tab" :title="'Shortcut: ' + ((i + 1) % 10)">
+          {{ t.label }} <span v-if="t.count" class="opacity-50">{{ t.count }}</span>
+        </button>
+      </template>
     </div>
   </nav>
 
-  <!-- ================= TAB: DECODER ================= -->
-  <section v-show="tab==='decoder'" class="p-5 sm:p-7">
-    <h2 class="sect">Ring of Light decoder</h2>
-    <p class="text-[13px] mb-4" style="color:var(--dim)">Hold <b class="text-white">Sync</b>, tap <b class="text-white">Eject</b> four times and count the lit quadrants for each digit. Click the quadrants below to match what your console shows &mdash; the diagnosis resolves live.</p>
+  <!-- ================= VIEW ================= -->
+  <main id="main" class="flex-1 noprint" tabindex="-1">
+    <keep-alive>
+      <component :is="view"></component>
+    </keep-alive>
+  </main>
+
+  <footer class="noprint px-5 sm:px-7 py-7 text-[12.5px] flex flex-wrap gap-x-5 gap-y-2 justify-between dim footer">
+    <span>360 Diagnostic Wiki &mdash; community reference, no warranty. Verify before you reball.</span>
+    <span class="flex gap-4 flex-wrap">
+      <a :href="issueUrl(footerContext)" target="_blank" rel="noopener" class="acc">Report a correction &#8599;</a>
+      <a :href="DB.meta.repo" target="_blank" rel="noopener" class="acc">Source on GitHub &#8599;</a>
+      <span class="hidden md:inline"><kbd class="kbd">/</kbd> search · <kbd class="kbd">1-0</kbd> tabs · <kbd class="kbd">0-3</kbd> digits</span>
+    </span>
+  </footer>
+
+  <!-- ================= BOTTOM BAR (mobile) ================= -->
+  <nav class="bottombar noprint sm:hidden" aria-label="Sections">
+    <button v-for="t in barTabs" :key="t.id" @click="go(t.id)" :data-on="tab === t.id ? '1' : '0'" :aria-current="tab === t.id ? 'page' : null">
+      <icon :n="t.icon" :s="20"></icon><span>{{ t.label.replace('Motherboards', 'Boards').replace('Error codes', 'Codes') }}</span>
+    </button>
+    <button @click="more = !more" :data-on="moreActive || more ? '1' : '0'" :aria-expanded="more">
+      <icon n="more" :s="20"></icon><span>More</span>
+    </button>
+  </nav>
+  <transition name="sheet">
+    <div v-if="more" class="sheet-scrim sm:hidden noprint" @click.self="more = false">
+      <div class="sheet panel" role="dialog" aria-label="All sections">
+        <button v-for="t in TABS" :key="t.id" @click="go(t.id)" :data-on="tab === t.id ? '1' : '0'" class="sheet-item">
+          <icon :n="t.icon"></icon>{{ t.label }}
+        </button>
+        <button @click="cycleTheme" class="sheet-item"><icon :n="S.theme === 'light' ? 'sun' : S.theme === 'dark' ? 'moon' : 'auto'"></icon>Theme: {{ S.theme }}</button>
+      </div>
+    </div>
+  </transition>
+
+  <!-- ================= COMMAND PALETTE ================= -->
+  <transition name="fade">
+    <div v-if="S.palette" class="pal-scrim noprint" @click.self="closePalette">
+      <div class="pal panel" role="dialog" aria-modal="true" aria-label="Search everything">
+        <div class="pal-head">
+          <icon n="search" :s="16" class="dim"></icon>
+          <input ref="pal" v-model="pq" @keydown="palKey" class="pal-input" placeholder="Codes, E-codes, boards, models, terms, fixes…"
+                 role="combobox" aria-expanded="true" aria-controls="pal-list" :aria-activedescendant="'pal-' + pi" autocomplete="off" spellcheck="false">
+          <kbd class="kbd">Esc</kbd>
+        </div>
+        <ul id="pal-list" ref="palList" class="pal-list" role="listbox">
+          <li v-for="(r, i) in results" :key="r.type + r.route + r.title" :id="'pal-' + i" role="option" :aria-selected="i === pi"
+              :data-on="i === pi ? '1' : '0'" @click="pick(i)" @mousemove="pi = i">
+            <span class="pal-type">{{ r.type }}</span>
+            <span class="min-w-0 flex-1"><span class="hi font-medium">{{ r.title }}</span>
+              <span v-if="r.sub" class="block text-[12px] dim truncate">{{ r.sub }}</span></span>
+          </li>
+          <li v-if="!results.length" class="pal-empty dim">Nothing matches "{{ pq }}"</li>
+        </ul>
+        <div class="pal-foot dim"><span><kbd class="kbd">↑</kbd><kbd class="kbd">↓</kbd> move</span><span><kbd class="kbd">Enter</kbd> open</span><span class="hidden sm:inline">Try "E74", "Jasper", "reball"</span></div>
+      </div>
+    </div>
+  </transition>
+
+  <div v-if="S.toast" class="toast panel noprint" role="status" aria-live="polite">{{ S.toast }}</div>
+
+  <!-- ================= PRINT SHEET ================= -->
+  <article v-if="S.print" class="print-sheet">
+    <h1>{{ S.print.title }}</h1>
+    <p v-if="S.print.subtitle">{{ S.print.subtitle }}</p>
+    <table v-if="S.print.meta"><tbody><tr v-for="m in S.print.meta" :key="m[0]"><th>{{ m[0] }}</th><td>{{ m[1] }}</td></tr></tbody></table>
+    <section v-for="s in S.print.sections || []" :key="s.h"><h2>{{ s.h }}</h2><p>{{ s.body }}</p></section>
+    <section v-if="S.print.codes && S.print.codes.length"><h2>Codes seen</h2>
+      <table><tbody><tr v-for="(c, i) in S.print.codes" :key="i"><th>{{ c.code }} ({{ crossRef(c.code) }})</th><td>{{ c.at }}</td><td>{{ c.row ? c.row.sys + ': ' + c.row.fix : 'Undocumented' }}</td></tr></tbody></table>
+    </section>
+    <section v-if="S.print.notes"><h2>Notes</h2><p class="whitespace-pre-wrap">{{ S.print.notes }}</p></section>
+    <p class="print-foot">{{ S.print.link || linkTo('') }} · 360 Diagnostic Wiki · printed {{ fmtDate(Date.now()) }}</p>
+  </article>
+</div>
+
+<!-- =====================================================================
+     Component templates. Vue reads these by id; keep tags kebab-case and
+     never self-close a component (these are parsed as HTML first).
+     ===================================================================== -->
+
+<template id="tpl-ring-digit">
+  <svg viewBox="0 0 100 100" :width="size" :height="size" :role="interactive ? 'group' : 'img'" :aria-label="label || ('Digit ' + d)">
+    <circle cx="50" cy="50" r="47" class="ring-bg"></circle>
+    <path v-for="q in 4" :key="q" :class="['ring-q', lit(d, q - 1) ? 'on' : 'off', interactive ? '' : 'static']" :d="quad(q - 1)"
+          @click="pick(q)" @keydown.enter.prevent="pick(q)" @keydown.space.prevent="pick(q)"
+          :tabindex="interactive ? 0 : null" :role="interactive ? 'button' : null"
+          :aria-label="interactive ? (q === 4 ? 'Four lights lit: digit 0' : q + ' light' + (q > 1 ? 's' : '') + ' lit: digit ' + q) : null"></path>
+    <circle cx="50" cy="50" r="18" class="ring-hub"></circle>
+    <text v-if="interactive" x="50" y="57" text-anchor="middle" class="mono" font-size="20" font-weight="700" fill="var(--acc)">{{ d }}</text>
+  </svg>
+</template>
+
+<!-- ============ DECODER ============ -->
+<template id="tpl-decoder">
+  <section class="view" aria-labelledby="h-decoder">
+    <div v-if="pinned.length || S.recent.length" class="flex flex-wrap items-center gap-x-4 gap-y-2 mb-5">
+      <div v-if="pinned.length" class="flex flex-wrap items-center gap-1.5">
+        <span class="label dim">Pinned</span>
+        <button v-for="p in pinned" :key="p.kind + p.id" @click="open(p)" class="chip px-2.5 py-1 text-[12px]">
+          <span :class="p.kind === 'code' ? 'mono' : ''">{{ p.label }}</span> <span class="dim">{{ p.sub }}</span></button>
+      </div>
+      <div v-if="S.recent.length" class="flex flex-wrap items-center gap-1.5">
+        <span class="label dim">Recent</span>
+        <button v-for="c in S.recent" :key="c" @click="loadCode(c)" class="chip mono px-2 py-1 text-[11.5px]" :data-on="c === code ? '1' : '0'">{{ c }}</button>
+        <button @click="S.recent = []" class="linkish text-[11.5px]">clear</button>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap items-end justify-between gap-3 sect-row">
+      <h2 id="h-decoder" class="sect m-0 border-0 p-0">Ring of Light decoder</h2>
+      <button @click="startGuide" class="btn btn-acc">Guided reading &rarr;</button>
+    </div>
+    <p class="text-[13px] mb-4 dim">Hold <b class="hi">Sync</b>, tap <b class="hi">Eject</b> four times and count the lit quadrants for each digit. Click the quadrants or press <kbd class="kbd">0</kbd>&ndash;<kbd class="kbd">3</kbd> to match what your console shows &mdash; the diagnosis resolves live.</p>
 
     <div class="grid lg:grid-cols-[auto_1fr] gap-4 items-start">
-      <div class="panel rounded p-4">
+      <div class="panel p-4">
         <div class="flex gap-2 sm:gap-3 flex-wrap justify-center">
-          <div v-for="(d,i) in digits" :key="i" class="text-center">
-            <div class="label mb-1" style="color:var(--dim)">Digit {{ i+1 }}</div>
-            <svg viewBox="0 0 100 100" width="80" height="80" :aria-label="'Digit '+(i+1)+' equals '+d">
-              <circle cx="50" cy="50" r="47" fill="#0d0f10" stroke="var(--line)"></circle>
-              <path v-for="q in 4" :key="q" :class="['ring-q', lit(d,q-1)?'on':'off']" :d="quad(q-1)"
-                    @click="setDigit(i, q===4?0:q)"></path>
-              <circle cx="50" cy="50" r="18" fill="#0b0d0e" stroke="var(--line)"></circle>
-              <text x="50" y="57" text-anchor="middle" class="mono" font-size="20" font-weight="700" fill="var(--acc)">{{ d }}</text>
-            </svg>
-            <div class="flex justify-center gap-1 mt-1">
-              <button v-for="n in [0,1,2,3]" :key="n" @click="setDigit(i,n)" :data-on="d===n?'1':'0'"
-                class="chip mono text-[10px] w-5 h-5 rounded leading-none cursor-pointer">{{ n }}</button>
+          <div v-for="(d, i) in S.digits" :key="i" class="text-center">
+            <div class="label mb-1 dim">Digit {{ i + 1 }}</div>
+            <ring-digit :d="d" :size="84" interactive :label="'Digit ' + (i + 1) + ' is ' + d" @set="setDigit(i, $event)"></ring-digit>
+            <div class="flex justify-center gap-1 mt-1" role="radiogroup" :aria-label="'Digit ' + (i + 1)">
+              <button v-for="n in [0, 1, 2, 3]" :key="n" @click="setDigit(i, n)" :data-on="d === n ? '1' : '0'" role="radio" :aria-checked="d === n"
+                class="chip mono digit-btn">{{ n }}</button>
             </div>
           </div>
         </div>
-        <div class="flex items-center justify-center gap-2 mt-4">
-          <button @click="digits=[0,0,0,0]" class="chip label px-3 py-1.5 rounded cursor-pointer">Reset</button>
-          <button @click="copy(code,'Code '+code+' copied')" class="chip label px-3 py-1.5 rounded cursor-pointer">Copy code</button>
-          <button @click="copy(permalink,'Permalink copied')" class="chip label px-3 py-1.5 rounded cursor-pointer">Copy link</button>
+        <div class="flex items-center justify-center flex-wrap gap-2 mt-4">
+          <button @click="reset" class="btn">Reset</button>
+          <button @click="copy(code, 'Code ' + code + ' copied')" class="btn">Copy code</button>
+          <button @click="copy(linkTo('decoder/' + code), 'Permalink copied')" class="btn"><icon n="link" :s="14"></icon> Copy link</button>
         </div>
       </div>
 
-      <div class="panel rounded p-4 min-h-[230px]">
-        <div class="flex flex-wrap items-center gap-3 mb-3 pb-3" style="border-bottom:1px solid var(--line)">
+      <div class="panel p-4 min-h-[230px]" aria-live="polite">
+        <div class="flex flex-wrap items-center gap-3 mb-3 pb-3 rule-b">
           <span class="code-pill text-[20px]">{{ code }}</span>
-          <span class="mono" style="color:var(--dim)">&rarr;</span>
+          <span class="mono dim">&rarr;</span>
           <span class="code-pill text-[20px]">E{{ ecode }}</span>
-          <span class="text-[11px] leading-tight" style="color:var(--dim)">the secondary code is<br>the E-code written in base&nbsp;4</span>
+          <span class="text-[11px] leading-tight dim">the secondary code is<br>the E-code written in base&nbsp;4</span>
+          <span class="ml-auto flex items-center gap-1" v-if="match">
+            <fav-star :k="'code:' + match.code.split(' ')[0]" :label="match.code"></fav-star>
+            <button class="icon-btn" @click="printCode" title="Print a repair sheet" aria-label="Print a repair sheet"><icon n="print" :s="16"></icon></button>
+          </span>
         </div>
         <template v-if="match">
-          <div class="flex flex-wrap gap-1.5 mb-2">
-            <span class="chip px-2 py-0.5 rounded label">{{ match.sys }}</span>
-            <span v-if="match.severity" class="px-2 py-0.5 rounded label capitalize" :style="sevStyle(match.severity)">{{ match.severity }}</span>
-            <span v-if="match.difficulty" class="chip px-2.5 py-0.5 rounded label capitalize">Fix: {{ match.difficulty }}</span>
-            <span class="chip px-2 py-0.5 rounded mono text-[10px]">{{ match.boards }}</span>
+          <div class="flex flex-wrap gap-1.5 mb-2 items-center">
+            <span class="chip px-2 py-0.5 label">{{ match.sys }}</span>
+            <sev-badge :sev="match.severity"></sev-badge>
+            <span v-if="match.difficulty" class="chip px-2.5 py-0.5 label capitalize">Fix: {{ match.difficulty }}</span>
+            <span class="chip px-2 py-0.5 mono text-[10.5px]">{{ match.boards }}</span>
+            <span v-if="match.code !== code" class="text-[11.5px] dim">listed as <b class="mono acc">{{ match.code }}</b></span>
           </div>
-          <p class="text-[14px] text-white leading-relaxed">{{ match.fix }}</p>
-          <div v-if="match.detail" class="mt-3 pt-3 text-[13px]" style="border-top:1px solid var(--line);color:var(--txt)">
-            <span class="label block mb-1" style="color:var(--dim)">Deeper</span>{{ match.detail }}
+          <p class="text-[14px] hi leading-relaxed" v-html="lk(match.fix)"></p>
+          <div v-if="match.detail" class="mt-3 pt-3 text-[13px] rule-t">
+            <span class="label block mb-1 dim">Deeper</span><span v-html="lk(match.detail)"></span>
           </div>
-          <div v-if="match.related && match.related.length" class="mt-3 flex flex-wrap gap-1.5 items-center">
-            <span class="label" style="color:var(--dim)">Related</span>
-            <button v-for="r in match.related" :key="r" @click="loadCode(r)" class="chip px-2 py-0.5 rounded mono text-[11px] cursor-pointer hover:text-white">{{ r }}</button>
+          <div class="grid sm:grid-cols-2 gap-3 mt-3 pt-3 rule-t text-[12.5px]">
+            <div v-if="toolsFor.length">
+              <span class="label block mb-1 dim">What you'll need</span>
+              <ul class="ticks">
+                <li v-for="t in toolsFor" :key="t">{{ t }}</li>
+              </ul>
+            </div>
+            <div>
+              <template v-if="boardsFor.length">
+                <span class="label block mb-1 dim">Typical on</span>
+                <div class="flex flex-wrap gap-1.5 mb-3">
+                  <button v-for="b in boardsFor" :key="b.slug" @click="nav('boards/' + b.slug)" class="chip px-2 py-0.5 text-[12px]"><tier-box :tier="b.tier" size="xs"></tier-box> {{ b.name }}</button>
+                </div>
+              </template>
+              <template v-if="match.related && match.related.length">
+                <span class="label block mb-1 dim">Related</span>
+                <div class="flex flex-wrap gap-1.5">
+                  <button v-for="r in match.related" :key="r" @click="loadCode(r)" class="chip px-2 py-0.5 mono text-[11px]">{{ r }}</button>
+                </div>
+              </template>
+            </div>
+          </div>
+          <div class="flex flex-wrap items-center gap-2 mt-4 pt-3 rule-t">
+            <label class="label dim" for="logsel">Save to repair log</label>
+            <select id="logsel" v-model="logTarget" class="field text-[12.5px] py-1.5">
+              <option value="">New console</option>
+              <option v-for="c in S.consoles" :key="c.id" :value="c.id">{{ c.name }}</option>
+            </select>
+            <button @click="saveToLog" class="btn">Log {{ code }}</button>
+            <button @click="nav('codes/' + match.code.split(' ')[0])" class="linkish text-[12px] ml-auto">Open in the code table &rarr;</button>
           </div>
         </template>
         <template v-else>
-          <p class="text-[13px]" style="color:var(--dim)">No entry for <b class="acc mono">{{ code }}</b> yet &mdash; either an unused combination or an undocumented one. Re-count your digits, or jump to the nearest documented codes:</p>
+          <p class="text-[13px] dim">No entry for <b class="acc mono">{{ code }}</b> yet &mdash; either an unused combination or an undocumented one. Re-count your digits, or jump to the nearest documented codes:</p>
           <div class="flex flex-wrap gap-1.5 mt-3">
-            <button v-for="n in neighbours" :key="n.code" @click="loadCode(n.code)"
-              class="chip px-2 py-1 rounded mono text-[11px] cursor-pointer hover:text-white">{{ n.code }} · {{ n.sys }}</button>
+            <button v-for="n in neighbours" :key="n.code" @click="loadCode(n.code)" class="chip px-2 py-1 mono text-[11px]">{{ n.code }} · {{ n.sys }}</button>
           </div>
+          <p class="text-[12px] mt-4 dim">Know what this one means? <a :href="issueUrl('Undocumented code ' + code + ' (E' + ecode + ')')" target="_blank" rel="noopener" class="acc">Tell us &#8599;</a></p>
         </template>
       </div>
     </div>
 
-    <h2 class="sect mt-8">E-code &harr; secondary converter</h2>
-    <div class="panel rounded p-4 flex flex-wrap items-center gap-3">
-      <label class="label" style="color:var(--dim)" for="ec">Dashboard E-code</label>
-      <span class="mono acc font-bold">E</span>
-      <input id="ec" v-model="eInput" type="number" min="0" max="255" class="mono w-24 px-2 py-1.5 rounded"
-             style="background:var(--panel-2);border:1px solid var(--line);color:var(--acc)">
-      <span class="mono text-[12px]" style="color:var(--dim)">= secondary</span>
-      <span class="code-pill text-[16px]">{{ eToSecondary }}</span>
-      <button @click="loadCode(eToSecondary)" class="chip label px-3 py-1.5 rounded cursor-pointer">Load in decoder</button>
-      <span class="text-[12px] basis-full" style="color:var(--dim)">E74 = 1022, E68 = 1010, E71 = 1013 &mdash; same number, different base.</span>
+    <!-- primary lights -->
+    <h2 class="sect mt-9">What the lights mean</h2>
+    <div class="flex flex-wrap items-center gap-1.5 mb-3" role="radiogroup" aria-label="Console">
+      <button v-for="c in ['Phat', 'Slim (S)', 'E']" :key="c" @click="chassis = c" :data-on="chassis === c ? '1' : '0'" role="radio" :aria-checked="chassis === c" class="chip label px-3 py-1">{{ c }}</button>
+      <span class="text-[12px] dim ml-1">The number of red lights says <i>what kind</i> of fault; the secondary code says <i>which part</i>.</span>
+    </div>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <button v-for="p in primary" :key="p.title" @click="nav(p.route)" class="panel card-btn p-3 text-left">
+        <div class="flex items-center gap-3 mb-2">
+          <svg v-if="p.lights" viewBox="0 0 100 100" width="44" height="44" aria-hidden="true" class="shrink-0">
+            <circle cx="50" cy="50" r="47" class="ring-bg"></circle>
+            <path v-for="q in 4" :key="q" :class="['ring-q', 'static', q - 1 < p.lights ? 'on' : 'off']" :d="ringQuad(q - 1)"></path>
+            <circle cx="50" cy="50" r="18" class="ring-hub"></circle>
+          </svg>
+          <span v-else class="power-dot" aria-hidden="true"></span>
+          <span class="text-[14px] font-semibold hi leading-snug">{{ p.lights ? p.lights + ' red: ' : '' }}{{ p.title }}</span>
+        </div>
+        <p class="text-[12.5px] m-0 mb-1.5">{{ p.meaning }}</p>
+        <p class="text-[12px] m-0 dim">{{ p.action }}</p>
+      </button>
     </div>
 
-    <h2 class="sect mt-8">Reading the code</h2>
-    <div class="panel rounded p-4">
+    <!-- power brick -->
+    <h2 class="sect mt-9">Power brick LED</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+      <div v-for="b in DB.brick" :key="b.led" class="panel p-3">
+        <div class="flex items-center gap-2 mb-1.5">
+          <span class="led" :style="{ '--led': b.color }" :data-off="b.led === 'Off' ? '1' : '0'" aria-hidden="true"></span>
+          <span class="text-[14px] font-semibold hi">{{ b.led }}</span>
+        </div>
+        <p class="text-[12.5px] m-0 mb-1.5">{{ b.meaning }}</p>
+        <p class="text-[12px] m-0 dim">{{ b.action }}</p>
+      </div>
+    </div>
+    <p class="text-[12px] mt-2 dim">Brick wattage tells you the board generation &mdash; <a href="#boards" class="acc">see the power brick table</a>. Not booting at all? <a href="#troubleshoot/nopower" class="acc">Start the no-power troubleshooter</a>.</p>
+
+    <!-- converter -->
+    <h2 class="sect mt-9">E-code &harr; secondary converter</h2>
+    <div class="panel p-4 flex flex-wrap items-center gap-3">
+      <label class="label dim" for="ec">Dashboard E-code</label>
+      <span class="mono acc font-bold">E</span>
+      <input id="ec" v-model="eInput" type="number" min="0" max="255" inputmode="numeric" class="field mono w-24 acc">
+      <span class="mono text-[12px] dim">= secondary</span>
+      <span class="code-pill text-[16px]">{{ eToSecondary }}</span>
+      <button @click="loadCode(eToSecondary)" class="btn">Load in decoder</button>
+      <span v-if="eRow" class="text-[12.5px]"><span class="chip label px-2 py-0.5">{{ eRow.sys }}</span> {{ eRow.fix.split('. ')[0] }}.</span>
+      <span class="text-[12px] basis-full dim">E74 = 1022, E68 = 1010, E71 = 1013 &mdash; same number, different base.</span>
+    </div>
+
+    <h2 class="sect mt-9">Reading the code</h2>
+    <div class="panel p-4">
       <ol class="list-decimal ml-5 space-y-1 text-[13px]">
         <li>Power the console on and wait for the red lights.</li>
-        <li>Press and <b class="text-white">hold</b> the Sync button on the front.</li>
-        <li>Still holding Sync, press <b class="text-white">Eject</b> once &mdash; the lights change to digit 1.</li>
-        <li>Release Eject and press it again for each of the <b class="text-white">4 digits</b>.</li>
-        <li>Every digit is 0&ndash;3, counted from the lit quadrants.</li>
+        <li>Press and <b class="hi">hold</b> the Sync button on the front.</li>
+        <li>Still holding Sync, press <b class="hi">Eject</b> once &mdash; the lights change to digit 1.</li>
+        <li>Release Eject and press it again for each of the <b class="hi">4 digits</b>.</li>
+        <li>Every digit is 0&ndash;3, counted from the lit quadrants. Four lit means 0.</li>
       </ol>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-4">
-        <div v-for="n in [0,1,2,3]" :key="n" class="panel rounded p-2 text-center">
-          <svg viewBox="0 0 100 100" width="52" height="52" class="mx-auto">
-            <circle cx="50" cy="50" r="47" fill="#0d0f10" stroke="var(--line)"></circle>
-            <path v-for="q in 4" :key="q" :class="['ring-q','static', lit(n,q-1)?'on':'off']" :d="quad(q-1)"></path>
-            <circle cx="50" cy="50" r="18" fill="#0b0d0e" stroke="var(--line)"></circle>
-          </svg>
-          <div class="mono text-[11px] mt-1" style="color:var(--dim)">= <b class="acc">{{ n }}</b></div>
+        <div v-for="n in [1, 2, 3, 0]" :key="n" class="panel p-2 text-center">
+          <ring-digit :d="n" :size="52" class="mx-auto"></ring-digit>
+          <div class="mono text-[11px] mt-1 dim">= <b class="acc">{{ n }}</b></div>
         </div>
       </div>
-      <p class="text-[12px] mt-3" style="color:var(--dim)">Don't guess, and don't bake the board in a towel. Get the exact code first.</p>
+      <p class="text-[12px] mt-3 dim">Don't guess, and don't bake the board in a towel. Get the exact code first.</p>
+    </div>
+
+    <!-- guided reading -->
+    <transition name="fade">
+      <div v-if="guide" class="pal-scrim" @click.self="closeGuide">
+        <div class="guide panel" role="dialog" aria-modal="true" aria-labelledby="guide-h" ref="guide" tabindex="-1" @keydown.esc="closeGuide">
+          <div class="flex items-center justify-between mb-3">
+            <span class="label dim">Guided reading · {{ guide.step < 2 ? 'Step ' + (guide.step + 1) + ' of 2' : 'Digit ' + (guide.digits.length + 1) + ' of 4' }}</span>
+            <button class="icon-btn" @click="closeGuide" aria-label="Close"><icon n="x" :s="16"></icon></button>
+          </div>
+          <template v-if="guide.step === 0">
+            <h3 id="guide-h" class="guide-h">Turn the console on and wait for the red lights.</h3>
+            <p class="dim text-[13px]">Leave the AV cable connected. If you see four red lights, that is a cable problem, not a code.</p>
+            <button class="btn btn-acc btn-lg w-full mt-4" @click="guideNext">The lights are on</button>
+          </template>
+          <template v-else-if="guide.step === 1">
+            <h3 id="guide-h" class="guide-h">Press and hold the Sync button.</h3>
+            <p class="dim text-[13px]">On a Phat it is the small round button on the front, beside the memory unit slots. Keep holding it for the rest of this.</p>
+            <button class="btn btn-acc btn-lg w-full mt-4" @click="guideNext">I'm holding Sync</button>
+          </template>
+          <template v-else>
+            <h3 id="guide-h" class="guide-h">Tap <b class="acc">Eject</b> once. How many quadrants are lit?</h3>
+            <div class="grid grid-cols-2 gap-2.5 mt-3">
+              <button v-for="n in [1, 2, 3, 4]" :key="n" @click="guidePick(n % 4)" class="guide-opt">
+                <ring-digit :d="n % 4" :size="64"></ring-digit>
+                <span>{{ n }} light{{ n > 1 ? 's' : '' }}</span>
+              </button>
+            </div>
+            <div class="flex items-center gap-2 mt-4">
+              <span class="label dim">So far</span>
+              <span class="code-pill">{{ (guide.digits.join('') + '____').slice(0, 4) }}</span>
+            </div>
+          </template>
+          <button class="linkish text-[12px] mt-4" @click="guideBack">&larr; Back</button>
+        </div>
+      </div>
+    </transition>
+  </section>
+</template>
+
+<!-- ============ TROUBLESHOOT ============ -->
+<template id="tpl-troubleshoot">
+  <section class="view" aria-labelledby="h-ts">
+    <h2 id="h-ts" class="sect">Troubleshooter</h2>
+    <p class="text-[13px] mb-4 dim">Answer a few questions and it points you at the likely fault. Every step has its own link, so you can share where you got to.</p>
+
+    <ol v-if="trail.length" class="crumbs mb-4" aria-label="Your answers">
+      <li v-for="(t, i) in trail" :key="i">
+        <button @click="back(i)" class="crumb" :title="q(t.node)">{{ t.answer }}</button>
+      </li>
+    </ol>
+
+    <div class="panel p-5 sm:p-6 max-w-[760px]" aria-live="polite">
+      <template v-if="node.options">
+        <h3 class="text-[18px] sm:text-[20px] font-semibold hi m-0 mb-4 tracking-[-0.01em]">{{ node.q }}</h3>
+        <div class="grid gap-2">
+          <button v-for="o in node.options" :key="o.next" @click="pick(o)" class="answer">
+            <span>{{ o.label }}</span><span class="acc" aria-hidden="true">&rarr;</span>
+          </button>
+        </div>
+      </template>
+      <template v-else>
+        <div class="label acc mb-1">Likely cause</div>
+        <h3 class="text-[20px] font-semibold hi m-0 mb-3 tracking-[-0.01em]">{{ node.title }}</h3>
+        <p class="text-[14px] leading-relaxed m-0" v-html="lk(node.result)"></p>
+        <div v-if="node.links" class="flex flex-wrap gap-2 mt-4">
+          <button v-for="l in node.links" :key="l.route" @click="nav(l.route)" class="btn">{{ l.label }} &rarr;</button>
+        </div>
+      </template>
+      <div class="flex flex-wrap gap-3 mt-5 pt-4 rule-t text-[12.5px]">
+        <button v-if="depth" @click="back()" class="linkish">&larr; Back</button>
+        <button v-if="depth" @click="restart" class="linkish">Start over</button>
+        <button @click="copy(linkTo('troubleshoot/' + id), 'Link copied')" class="linkish ml-auto">Copy link to this step</button>
+      </div>
     </div>
   </section>
+</template>
 
-  <!-- ================= TAB: CODES ================= -->
-  <section v-show="tab==='codes'" class="p-5 sm:p-7">
-    <h2 class="sect">Secondary error codes</h2>
+<!-- ============ CODES ============ -->
+<template id="tpl-codes">
+  <section class="view" aria-labelledby="h-codes">
+    <h2 id="h-codes" class="sect">Secondary error codes</h2>
     <div class="flex flex-wrap gap-2 items-center mb-3">
-      <input ref="search" v-model="q" placeholder="Fuzzy search: 0102, E74, GPU, Jasper, underfill..."
-             class="flex-1 min-w-[220px] px-3.5 py-2.5 rounded text-[13.5px]"
-             style="background:var(--panel-2);border:1px solid var(--line);color:var(--hi)">
-      <button v-if="q" @click="q=''" class="chip label px-3 py-2 rounded cursor-pointer">Clear</button>
-      <span class="mono text-[11px]" style="color:var(--dim)">{{ shown.length }} / {{ DB.errors.length }}</span>
+      <input v-model="q" type="search" placeholder="Fuzzy search: 0102, E74, GPU, Jasper, underfill..." aria-label="Search error codes"
+             class="field flex-1 min-w-[220px] text-[13.5px] py-2.5">
+      <button v-if="q || sysSel.length || sevSel.length" @click="clear" class="btn">Clear</button>
+      <span class="mono text-[11px] dim" aria-live="polite">{{ shown.length }} / {{ DB.errors.length }}</span>
     </div>
-    <div class="flex flex-wrap gap-1.5 mb-4">
-      <button @click="sysSel=[]" :data-on="sysSel.length?'0':'1'" class="chip label px-2 py-1 rounded cursor-pointer">All</button>
-      <button v-for="s in systems" :key="s" @click="toggleSys(s)" :data-on="sysSel.includes(s)?'1':'0'"
-              class="chip label px-2 py-1 rounded cursor-pointer">{{ s }}</button>
+    <div class="flex flex-wrap gap-1.5 mb-2" role="group" aria-label="Filter by severity">
+      <span class="label dim self-center w-[70px]">Severity</span>
+      <button v-for="s in sevs" :key="s" @click="toggle(sevSel, s)" :data-on="sevSel.includes(s) ? '1' : '0'" :aria-pressed="sevSel.includes(s)"
+              class="chip label px-2 py-1 capitalize"><span class="sev-dot" :data-sev="s"></span>{{ s }}</button>
+    </div>
+    <div class="flex flex-wrap gap-1.5 mb-4" role="group" aria-label="Filter by sub-system">
+      <span class="label dim self-center w-[70px]">System</span>
+      <button v-for="s in systems" :key="s" @click="toggle(sysSel, s)" :data-on="sysSel.includes(s) ? '1' : '0'" :aria-pressed="sysSel.includes(s)"
+              class="chip label px-2 py-1">{{ s }}</button>
     </div>
 
-    <div class="panel rounded overflow-hidden">
-      <div class="overflow-x-auto max-h-[70vh]">
-        <table>
+    <div class="panel overflow-hidden">
+      <div class="overflow-x-auto max-h-[72vh] table-wrap">
+        <table class="stack">
           <thead><tr>
-            <th style="width:88px">Code</th><th style="width:66px">Cross-ref</th><th style="width:118px">Sub-system</th>
-            <th style="width:96px">Severity</th><th style="width:150px">Boards</th><th>Diagnosis &amp; fix</th>
+            <th style="width:96px" :aria-sort="ariaSort('code')"><button class="th-btn" @click="sortBy('code')">Code{{ sortMark('code') }}</button></th>
+            <th style="width:70px">Cross-ref</th>
+            <th style="width:120px" :aria-sort="ariaSort('sys')"><button class="th-btn" @click="sortBy('sys')">Sub-system{{ sortMark('sys') }}</button></th>
+            <th style="width:100px" :aria-sort="ariaSort('severity')"><button class="th-btn" @click="sortBy('severity')">Severity{{ sortMark('severity') }}</button></th>
+            <th style="width:150px">Boards</th><th>Diagnosis &amp; fix</th>
           </tr></thead>
           <tbody>
             <template v-for="e in shown" :key="e.code">
-              <tr @click="expand = expand===e.code ? '' : e.code" class="cursor-pointer">
-                <td><span class="code-pill" v-html="hl(e.code)"></span></td>
-                <td class="mono text-[12px]" style="color:var(--dim)">{{ eOf(e.code) }}</td>
-                <td><span class="chip px-2.5 py-0.5 rounded label whitespace-nowrap">{{ e.sys }}</span></td>
-                <td><span v-if="e.severity" class="px-2 py-0.5 rounded label whitespace-nowrap capitalize" :style="sevStyle(e.severity)">{{ e.severity }}</span></td>
-                <td class="text-[12px]" style="color:var(--dim)" v-html="hl(e.boards)"></td>
-                <td class="text-[13px]"><span v-html="hl(e.fix)"></span>
-                  <span class="acc text-[11px] ml-1.5 align-middle">{{ expand===e.code ? '▾' : '▸' }}</span></td>
+              <tr :id="'code-' + e.code.split(' ')[0]" @click="open(e)" class="cursor-pointer" :data-open="expand === e.code ? '1' : '0'"
+                  tabindex="0" @keydown.enter="open(e)" :aria-expanded="expand === e.code">
+                <td data-label="Code"><span class="code-pill" v-html="hl(e.code)"></span></td>
+                <td data-label="Cross-ref" class="mono text-[12px] dim">{{ crossRef(e.code) }}</td>
+                <td data-label="System"><span class="chip px-2.5 py-0.5 label whitespace-nowrap">{{ e.sys }}</span></td>
+                <td data-label="Severity"><sev-badge :sev="e.severity"></sev-badge></td>
+                <td data-label="Boards" class="text-[12px] dim" v-html="hl(e.boards)"></td>
+                <td data-label="Fix" class="text-[13px]"><span v-html="hl(e.fix)"></span>
+                  <span class="acc text-[11px] ml-1.5 align-middle" aria-hidden="true">{{ expand === e.code ? '▾' : '▸' }}</span></td>
               </tr>
-              <tr v-if="expand===e.code" style="background:#0e1112">
+              <tr v-if="expand === e.code" class="expand-row">
                 <td colspan="6" class="text-[13px]">
-                  <div class="flex flex-wrap gap-3 items-start">
-                    <div class="flex-1 min-w-[280px]">
-                      <span class="label block mb-1" style="color:var(--dim)">Deeper</span>
-                      {{ e.detail || 'No extra notes yet.' }}
+                  <div class="flex flex-wrap gap-4 items-start">
+                    <div class="flex-1 min-w-[240px]">
+                      <span class="label block mb-1 dim">Deeper</span>
+                      <span v-html="lk(e.detail || 'No extra notes yet.')"></span>
                     </div>
-                    <div class="text-[12px] space-y-1" style="color:var(--dim)">
+                    <div class="text-[12px] space-y-1.5 dim min-w-[200px]">
                       <div v-if="e.difficulty">Fix difficulty: <b class="acc capitalize">{{ e.difficulty }}</b></div>
-                      <div>Cross-ref: <b class="acc">{{ eOf(e.code) }}</b></div>
+                      <div>Cross-ref: <b class="acc mono">{{ crossRef(e.code) }}</b></div>
                       <div class="flex gap-1.5 flex-wrap items-center" v-if="e.related && e.related.length">Related:
-                        <button v-for="r in e.related" :key="r" @click.stop="loadCode(r)" class="chip px-1.5 py-0.5 rounded cursor-pointer hover:text-white">{{ r }}</button>
+                        <button v-for="r in e.related" :key="r" @click.stop="loadCode(r)" class="chip px-1.5 py-0.5 mono">{{ r }}</button>
                       </div>
-                      <button @click.stop="loadCode(e.code)" class="chip px-2.5 py-1 rounded cursor-pointer">Open in decoder &rarr;</button>
+                      <div class="flex gap-1.5 flex-wrap items-center pt-1">
+                        <button @click.stop="loadCode(e.code)" class="btn">Open in decoder &rarr;</button>
+                        <button @click.stop="share(e)" class="icon-btn" title="Copy link" aria-label="Copy link to this code"><icon n="link" :s="15"></icon></button>
+                        <fav-star :k="'code:' + e.code.split(' ')[0]" :label="e.code"></fav-star>
+                      </div>
                     </div>
                   </div>
                 </td>
               </tr>
             </template>
-            <tr v-if="!shown.length"><td colspan="6" class="text-center py-10" style="color:var(--dim)">No match for "{{ q }}"</td></tr>
+            <tr v-if="!shown.length"><td colspan="6" class="text-center py-10 dim">
+              No match for "{{ q }}"<template v-if="suggestions.length">. Did you mean
+                <button v-for="s in suggestions" :key="s.code" @click="q = s.code" class="chip mono px-2 py-0.5 mx-0.5">{{ s.code }}</button>?</template>
+            </td></tr>
           </tbody>
         </table>
       </div>
     </div>
-    <p class="text-[12px] mt-3" style="color:var(--dim)">Click any row to expand. Codes not listed are undocumented rather than impossible &mdash; PRs welcome.</p>
+    <p class="text-[12px] mt-3 dim">Click any row to expand. Codes not listed are undocumented rather than impossible &mdash; <a :href="issueUrl('New error code')" target="_blank" rel="noopener" class="acc">corrections welcome</a>.</p>
   </section>
+</template>
 
-  <!-- ================= TAB: BOARDS ================= -->
-  <section v-show="tab==='boards'" class="p-5 sm:p-7">
-    <h2 class="sect">Motherboard revisions</h2>
-    <p class="text-[13px] mb-3" style="color:var(--dim)">Ten revisions over nine years. Most can be identified without opening the console &mdash; the manufacture date on the rear sticker, whether there is an HDMI port, and the wattage printed on the power brick narrow it to one or two revisions.</p>
-    <div class="flex flex-wrap gap-1.5 mb-4">
-      <button v-for="f in [['','All'],['safe','Safe to buy (S+/S/A)'],['risky','Risky (B/C/F)'],['glitch','RGH/JTAG capable']]" :key="f[0]"
-              @click="boardFilter=f[0]" :data-on="boardFilter===f[0]?'1':'0'"
-              class="chip label px-2 py-1 rounded cursor-pointer">{{ f[1] }}</button>
+<!-- ============ IDENTIFY ============ -->
+<template id="tpl-identify">
+  <section class="view" aria-labelledby="h-id">
+    <div class="flex flex-wrap items-end justify-between gap-3 sect-row">
+      <h2 id="h-id" class="sect m-0 border-0 p-0">Which motherboard do I have?</h2>
+      <button v-if="answered" @click="reset" class="btn">Start over</button>
+    </div>
+    <p class="text-[13px] mb-4 dim">You can usually tell without opening the case. Answer what you can &mdash; every answer narrows it down, and the link updates so you can share the result.</p>
+
+    <div class="grid lg:grid-cols-[1fr_360px] gap-4 items-start">
+      <div class="space-y-3">
+        <fieldset class="panel p-4 q-card">
+          <legend class="q-legend">1 · Which console is it?</legend>
+          <div class="grid grid-cols-3 gap-2">
+            <button v-for="c in [['Phat', 'Original, 2005-2010. Ring of Light on the front.'], ['Slim (S)', 'Smaller, glossy or matte black, touch power button.'], ['E', 'Two-tone, angular, physical buttons. 2013 on.']]"
+                    :key="c[0]" @click="set('c', c[0])" :data-on="on('c', c[0])" :aria-pressed="a.c === c[0]" class="opt">
+              <b class="hi">{{ c[0] }}</b><span class="dim text-[11.5px] leading-snug">{{ c[1] }}</span></button>
+          </div>
+        </fieldset>
+
+        <fieldset v-if="a.c === 'Phat' || !a.c" class="panel p-4 q-card">
+          <legend class="q-legend">2 · Is there an HDMI port on the back?</legend>
+          <div class="grid grid-cols-2 gap-2">
+            <button @click="set('hdmi', '1')" :data-on="on('hdmi', '1')" :aria-pressed="a.hdmi === '1'" class="opt"><b class="hi">Yes</b></button>
+            <button @click="set('hdmi', '0')" :data-on="on('hdmi', '0')" :aria-pressed="a.hdmi === '0'" class="opt"><b class="hi">No</b></button>
+          </div>
+        </fieldset>
+
+        <fieldset class="panel p-4 q-card">
+          <legend class="q-legend">{{ a.c === 'Phat' || !a.c ? 3 : 2 }} · What wattage is printed on the power brick?</legend>
+          <div class="flex flex-wrap gap-2">
+            <button v-for="w in wattOptions" :key="w" @click="set('w', w)" :data-on="on('w', w)" :aria-pressed="a.w === String(w)" class="opt opt-sm mono">{{ w }} W</button>
+          </div>
+          <p class="text-[11.5px] dim mt-2 mb-0">It's on the label on the brick itself, next to the 12 V output rating.</p>
+        </fieldset>
+
+        <fieldset class="panel p-4 q-card">
+          <legend class="q-legend">{{ a.c === 'Phat' || !a.c ? 4 : 3 }} · Manufacture date on the rear sticker</legend>
+          <div class="flex flex-wrap items-center gap-2">
+            <select :value="dYear" @change="setDate($event.target.value, dMonth)" class="field" aria-label="Year">
+              <option value="">Year</option>
+              <option v-for="y in years" :key="y" :value="String(y)">{{ y }}</option>
+            </select>
+            <select :value="dMonth" @change="setDate(dYear, $event.target.value)" class="field" aria-label="Month" :disabled="!dYear">
+              <option value="">Month (optional)</option>
+              <option v-for="m in 12" :key="m" :value="String(m).padStart(2, '0')">{{ new Date(2000, m - 1).toLocaleString(undefined, { month: 'long' }) }}</option>
+            </select>
+          </div>
+          <p class="text-[11.5px] dim mt-2 mb-0">Look for "Mfg Date" or "MFR DATE" on the sticker by the AV port. Dates near a revision change can go either way.</p>
+        </fieldset>
+
+        <fieldset v-if="a.c === 'E'" class="panel p-4 q-card">
+          <legend class="q-legend">Opened it? Does the main chip have a metal lid?</legend>
+          <div class="grid grid-cols-2 gap-2">
+            <button @click="set('ihs', '1')" :data-on="on('ihs', '1')" :aria-pressed="a.ihs === '1'" class="opt"><b class="hi">Metal lid</b><span class="dim text-[11.5px]">Corona</span></button>
+            <button @click="set('ihs', '0')" :data-on="on('ihs', '0')" :aria-pressed="a.ihs === '0'" class="opt"><b class="hi">Bare silicon</b><span class="dim text-[11.5px]">Winchester</span></button>
+          </div>
+        </fieldset>
+      </div>
+
+      <aside class="panel p-4 lg:sticky lg:top-16" aria-live="polite">
+        <div class="label dim mb-2">{{ !answered ? 'All boards' : ranked.length === 1 ? 'Match' : ranked.length ? 'Most likely' : 'No match' }}</div>
+        <template v-if="top && answered">
+          <div class="flex items-center gap-2.5 mb-1">
+            <tier-box :tier="top.m.tier"></tier-box>
+            <span class="text-[19px] font-semibold hi">{{ top.m.name }}</span>
+          </div>
+          <div class="text-[12px] dim mb-2">{{ top.m.year }} · {{ confident ? 'confident' : 'needs another answer' }}</div>
+          <p class="text-[12.5px] m-0 mb-3">{{ top.m.ident }}</p>
+          <button @click="nav('boards/' + top.m.slug)" class="btn btn-acc w-full mb-3">Open {{ top.m.name }} &rarr;</button>
+        </template>
+        <ul class="space-y-1.5 m-0 p-0 list-none">
+          <li v-for="r in ranked" :key="r.m.slug">
+            <button @click="nav('boards/' + r.m.slug)" class="cand">
+              <span class="flex items-center gap-2 min-w-0"><tier-box :tier="r.m.tier" size="xs"></tier-box><span class="truncate">{{ r.m.name }}</span></span>
+              <span class="mono text-[11px] dim">{{ answered ? pct(r.p) + '%' : r.m.id.dateFrom.slice(0, 4) }}</span>
+              <span v-if="answered" class="cand-bar" :style="{ width: pct(r.p) + '%' }"></span>
+            </button>
+          </li>
+        </ul>
+        <p v-if="!ranked.length" class="text-[12.5px] dim">Those answers don't fit any retail board. Double-check the brick wattage &mdash; a swapped brick is common.</p>
+        <p class="text-[11.5px] dim mt-3 mb-0">Matching on chassis, HDMI, brick wattage and production window. Corona revisions V1&ndash;V6 need the board itself to tell apart.</p>
+      </aside>
+    </div>
+  </section>
+</template>
+
+<!-- ============ BOARDS ============ -->
+<template id="tpl-boards">
+  <section class="view" aria-labelledby="h-boards">
+    <div class="flex flex-wrap items-end justify-between gap-3 sect-row">
+      <h2 id="h-boards" class="sect m-0 border-0 p-0">Motherboard revisions</h2>
+      <button @click="nav('identify')" class="btn btn-acc">Identify my board &rarr;</button>
+    </div>
+    <p class="text-[13px] mb-3 dim">Ten revisions over nine years. Most can be identified without opening the console &mdash; the manufacture date on the rear sticker, whether there is an HDMI port, and the wattage printed on the power brick narrow it to one or two revisions.</p>
+    <div class="flex flex-wrap gap-1.5 mb-4" role="group" aria-label="Filter boards">
+      <button v-for="f in [['', 'All'], ['safe', 'Safe to buy (S+/S/A)'], ['risky', 'Risky (B/C/F)'], ['glitch', 'RGH/JTAG capable'], ['pinned', 'Pinned']]" :key="f[0]"
+              @click="filter = f[0]" :data-on="filter === f[0] ? '1' : '0'" :aria-pressed="filter === f[0]" class="chip label px-2 py-1">{{ f[1] }}</button>
     </div>
 
-    <div class="panel rounded p-4 mb-4" v-if="DB.psuConnectors">
-      <h3 class="label mb-1" style="color:var(--acc)">Power brick by generation</h3>
-      <p class="text-[12.5px] mb-3" style="color:var(--dim)">The wattage printed on the brick is the quickest way to place a phat, and the connectors are keyed so the generations do not mix.</p>
+    <div id="compare" v-if="cmp.length >= 2" class="panel overflow-hidden mb-5 scroll-mt-16">
+      <div class="flex items-center justify-between px-4 py-3 rule-b">
+        <h3 class="text-[15px] font-semibold hi m-0">Comparing {{ cmp.length }} boards</h3>
+        <button @click="clearCmp" class="linkish text-[12px]">Clear</button>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="cmp">
+          <thead><tr><th></th><th v-for="m in cmp" :key="m.slug"><span class="flex items-center gap-2"><tier-box :tier="m.tier" size="xs"></tier-box><span class="hi">{{ m.name }}</span></span></th></tr></thead>
+          <tbody>
+            <tr v-for="r in cmpRows" :key="r.k" :data-diff="r.diff ? '1' : '0'">
+              <th scope="row">{{ r.k }}</th><td v-for="(v, i) in r.v" :key="i" class="text-[12.5px]">{{ v }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-[11.5px] dim px-4 py-2 m-0 rule-t">Highlighted rows are where the boards differ.</p>
+    </div>
+
+    <div class="panel p-4 mb-4" v-if="DB.psuConnectors">
+      <h3 class="label mb-1 acc">Power brick by generation</h3>
+      <p class="text-[12.5px] mb-3 dim">The wattage printed on the brick is the quickest way to place a phat, and the connectors are keyed so the generations do not mix.</p>
       <div class="grid sm:grid-cols-3 gap-3">
         <div v-for="c in DB.psuConnectors" :key="c.watts" class="text-center">
           <div class="text-[22px] font-semibold acc">{{ c.watts }}</div>
-          <div class="mono text-[11px]" style="color:var(--dim)">{{ c.amps }}</div>
+          <div class="mono text-[11px] dim">{{ c.amps }}</div>
           <div class="text-[12.5px] font-medium mt-1">{{ c.boards }}</div>
-          <div class="text-[11.5px] mt-1" style="color:var(--dim)">{{ c.note }}</div>
+          <div class="text-[11.5px] mt-1 dim">{{ c.note }}</div>
         </div>
       </div>
-      <p class="text-[11.5px] mt-3 pt-3" style="color:var(--dim);border-top:1px solid var(--line-2)">{{ DB.psuNote }}</p>
+      <p class="text-[11.5px] mt-3 pt-3 dim rule-t">{{ DB.psuNote }}</p>
     </div>
+
     <div class="grid md:grid-cols-2 gap-3">
-      <article v-for="m in boards" :key="m.name" class="panel rounded p-4 relative">
-        <h3 class="flex items-center gap-2.5 text-[16px] font-semibold text-white m-0 tracking-[-0.01em]">
-          <span v-if="m.tier" :class="'tierbox tier-'+m.tier" class="w-11 h-7 text-[14px] shrink-0">{{ m.tier }}</span>
-          <span class="min-w-0">{{ m.name }}
-            <span class="text-[11px] font-normal" style="color:var(--dim)">{{ m.year }}</span></span></h3>
-        <div v-if="m.risk!=null" class="flex items-center gap-2 mt-2">
-          <span class="label w-[74px]" style="color:var(--dim)">RROD risk</span>
-          <div class="h-1.5 rounded-full flex-1" style="background:var(--panel-2)">
-            <div class="h-1.5 rounded-full" :style="{width:m.risk+'%',background:riskColor(m.risk),boxShadow:'0 0 8px '+riskColor(m.risk)}"></div>
+      <article v-for="m in boards" :key="m.slug" :id="'board-' + m.slug" class="panel p-4 relative scroll-mt-20" :data-flash="flash === m.slug ? '1' : '0'">
+        <h3 class="flex items-center gap-2.5 text-[16px] font-semibold hi m-0 tracking-[-0.01em]">
+          <tier-box :tier="m.tier"></tier-box>
+          <span class="min-w-0 flex-1">{{ m.name }} <span class="text-[11px] font-normal dim">{{ m.year }}</span></span>
+          <fav-star :k="'board:' + m.slug" :label="m.name"></fav-star>
+          <button class="icon-btn" @click="copy(linkTo('boards/' + m.slug), 'Link to ' + m.name + ' copied')" :aria-label="'Copy link to ' + m.name" title="Copy link"><icon n="link" :s="15"></icon></button>
+        </h3>
+        <div v-if="m.risk != null" class="flex items-center gap-2 mt-2">
+          <span class="label w-[74px] dim">RROD risk</span>
+          <div class="bar flex-1" role="meter" :aria-valuenow="m.risk" aria-valuemin="0" aria-valuemax="100" :aria-label="'RROD risk ' + m.risk + '%'">
+            <div class="bar-fill" :style="{ width: m.risk + '%', background: riskColor(m.risk) }"></div>
           </div>
-          <span class="mono text-[10px]" :style="{color:riskColor(m.risk)}">{{ m.risk }}%</span>
+          <span class="mono text-[10.5px]" :style="{ color: riskColor(m.risk) }">{{ m.risk }}%</span>
         </div>
         <dl class="grid grid-cols-[74px_1fr] gap-x-2 gap-y-0.5 my-2 text-[12px]">
-          <template v-for="(v,k) in m.stats" :key="k">
-            <dt class="label pt-0.5" style="color:var(--dim)">{{ k }}</dt><dd class="m-0">{{ v }}</dd>
+          <template v-for="(v, k) in m.stats" :key="k">
+            <dt class="label pt-0.5 dim">{{ k }}</dt><dd class="m-0">{{ v }}</dd>
           </template>
         </dl>
-        <p class="text-[13px] m-0 pt-2" style="border-top:1px solid var(--line)">{{ m.desc }}</p>
-        <div v-if="m.ident" class="mt-2 text-[12px]">
-          <span class="label" style="color:var(--acc)">How to spot it &nbsp;</span>{{ m.ident }}
-        </div>
-        <div v-if="m.faults" class="mt-2 text-[12px]">
-          <span class="label" style="color:var(--dim)">Fails first &nbsp;</span>{{ m.faults }}
-        </div>
-        <div v-if="m.mod" class="mt-2 text-[12px]">
-          <span class="label" style="color:var(--dim)">Modding &nbsp;</span>{{ m.mod }}
-        </div>
-        <div v-if="m.codes && m.codes.length" class="flex flex-wrap gap-1.5 mt-3 pt-2" style="border-top:1px solid var(--line)">
-          <span class="label pt-1" style="color:var(--dim)">Its codes</span>
-          <button v-for="c in m.codes" :key="c" @click="loadCode(c)" class="chip px-2 py-0.5 rounded mono text-[11px] cursor-pointer hover:text-white">{{ c }}</button>
+        <p class="text-[13px] m-0 pt-2 rule-t" v-html="lk(m.desc)"></p>
+        <div v-if="m.ident" class="mt-2 text-[12px]"><span class="label acc">How to spot it &nbsp;</span>{{ m.ident }}</div>
+        <div v-if="m.faults" class="mt-2 text-[12px]"><span class="label dim">Fails first &nbsp;</span>{{ m.faults }}</div>
+        <div v-if="m.mod" class="mt-2 text-[12px]"><span class="label dim">Modding &nbsp;</span><span v-html="lk(m.mod)"></span></div>
+        <div class="flex flex-wrap items-center gap-1.5 mt-3 pt-2 rule-t">
+          <template v-if="m.codes && m.codes.length">
+            <span class="label dim">Its codes</span>
+            <button v-for="c in m.codes" :key="c" @click="loadCode(c)" class="chip px-2 py-0.5 mono text-[11px]">{{ c }}</button>
+          </template>
+          <label class="cmp-toggle ml-auto">
+            <input type="checkbox" :checked="inCmp(m)" @change="toggleCmp(m)"> Compare
+          </label>
         </div>
       </article>
     </div>
-  </section>
+    <p v-if="!boards.length" class="dim text-center py-10">Nothing pinned yet &mdash; use the star on a board card.</p>
 
-  <!-- ================= TAB: SOFTMODS ================= -->
-  <section v-show="tab==='softmods'" class="p-5 sm:p-7">
-    <h2 class="sect">Softmod &amp; glitch matrix</h2>
-    <p class="text-[13px] mb-4" style="color:var(--dim)">What each board can actually run. JTAG and RGH depend on the hardware; <b class="acc">BadUpdate is software only</b>, so it works on every revision &mdash; including the two that no glitch hack can touch.</p>
-    <div class="panel rounded overflow-hidden mb-8">
+    <div v-if="S.compare.length" class="cmp-tray panel noprint">
+      <span class="text-[12.5px]"><b class="hi">{{ S.compare.length }}</b> to compare</span>
+      <button v-if="S.compare.length >= 2" @click="showCmp" class="btn btn-acc">Compare</button>
+      <span v-else class="text-[12px] dim">pick one more</span>
+      <button @click="clearCmp" class="icon-btn" aria-label="Clear comparison"><icon n="x" :s="15"></icon></button>
+    </div>
+  </section>
+</template>
+
+<!-- ============ RANKING ============ -->
+<template id="tpl-ranking">
+  <section class="view" aria-labelledby="h-rank">
+    <h2 id="h-rank" class="sect">Reliability tier list</h2>
+    <p class="text-[13px] mb-4 dim">Scene consensus on how likely a board is to still be alive &mdash; not a performance ranking. Every 360 board performs identically.</p>
+    <div class="panel overflow-hidden mb-8">
+      <div v-for="t in DB.tiers" :key="t.tier" class="flex items-stretch rule-b">
+        <span :class="'tierbox tierrail tier-' + t.tier">{{ t.tier }}</span>
+        <div class="flex flex-wrap gap-2 p-3">
+          <button v-for="i in t.items" :key="i" @click="openBoard(i)" class="chip px-3 py-1 text-[12.5px]">{{ i }}</button>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="sect">Detailed scoreboard</h2>
+    <div class="panel overflow-hidden">
       <div class="overflow-x-auto">
-        <table>
+        <table class="stack">
+          <thead><tr>
+            <th v-for="c in cols" :key="c[0]" :aria-sort="ariaSort(c[0])">
+              <button class="th-btn" @click="sortBy(c[0])">{{ c[1] }}<span v-if="sortK === c[0]" class="acc">{{ sortD > 0 ? ' ▲' : ' ▼' }}</span></button>
+            </th></tr></thead>
+          <tbody>
+            <tr v-for="s in scoreboard" :key="s.board">
+              <td data-label="#" class="mono dim">{{ s.rank }}</td>
+              <td data-label="Board" class="whitespace-nowrap">
+                <button v-if="boardOf(s.board)" class="linkish hi font-bold" @click="openBoard(s.board)">{{ s.board }}</button><b v-else class="hi">{{ s.board }}</b></td>
+              <td data-label="Reliability" style="min-width:140px">
+                <div class="flex items-center gap-2">
+                  <div class="bar flex-1" style="min-width:56px"><div class="bar-fill" :style="{ width: (s.rel * 10) + '%', background: 'var(--acc)' }"></div></div>
+                  <span class="mono text-[11px] acc whitespace-nowrap">{{ s.relText }}</span>
+                </div>
+              </td>
+              <td data-label="Why" class="text-[13px]">{{ s.why }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</template>
+
+<!-- ============ MODELS ============ -->
+<template id="tpl-models">
+  <section class="view" aria-labelledby="h-models">
+    <h2 id="h-models" class="sect">Every Xbox 360 model</h2>
+    <p class="text-[13px] mb-3 dim">Three generations &mdash; the original "Phat" (2005), the S / "Slim" (2010) and the E (2013).</p>
+    <div class="flex flex-wrap gap-2 items-center mb-4">
+      <button v-for="g in gens" :key="g" @click="genSel = g" :data-on="genSel === g ? '1' : '0'" :aria-pressed="genSel === g" class="chip label px-2.5 py-1">{{ g }}</button>
+      <input v-model="mq" type="search" placeholder="Filter models and editions..." aria-label="Filter models" class="field sm:ml-auto text-[13px] min-w-[200px] flex-1 sm:flex-none">
+    </div>
+    <div class="panel overflow-hidden mb-8">
+      <div class="overflow-x-auto">
+        <table class="stack">
+          <thead><tr><th>Gen</th><th>SKU</th><th>Years</th><th>Storage</th><th>Finish</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr v-for="m in models" :key="m.gen + m.sku">
+              <td data-label="Gen"><span class="chip px-2 py-0.5 mono text-[10.5px] whitespace-nowrap">{{ m.gen }}</span></td>
+              <td data-label="SKU" class="font-bold hi whitespace-nowrap">{{ m.sku }}</td>
+              <td data-label="Years" class="mono text-[12.5px] whitespace-nowrap dim">{{ m.years }}</td>
+              <td data-label="Storage" class="text-[12px]">{{ m.storage }}</td>
+              <td data-label="Finish" class="text-[12px] dim">{{ m.finish }}</td>
+              <td data-label="Notes" class="text-[13px]">{{ m.notes }}</td>
+            </tr>
+            <tr v-if="!models.length"><td colspan="6" class="text-center py-8 dim">No model matches</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <h2 class="sect">Notable limited &amp; special editions</h2>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+      <article v-for="e in editions" :key="e.name" class="panel p-3">
+        <h3 class="text-[14px] font-semibold hi m-0">{{ e.name }}</h3>
+        <div class="label mb-1.5 dim">{{ e.year }} · {{ e.chassis }}</div>
+        <div v-if="e.board" class="flex items-baseline gap-1.5 mb-1.5">
+          <span class="label shrink-0 acc">Likely board</span>
+          <button v-if="boardIn(e.board)" class="linkish text-[12px] text-left" @click="open(boardIn(e.board))">{{ e.board }}</button>
+          <span v-else class="text-[12px]">{{ e.board }}</span>
+        </div>
+        <p class="text-[12px] m-0">{{ e.notes }}</p>
+      </article>
+    </div>
+    <p v-if="!editions.length" class="dim text-[13px]">No edition matches.</p>
+  </section>
+</template>
+
+<!-- ============ SOFTMODS ============ -->
+<template id="tpl-softmods">
+  <section class="view" aria-labelledby="h-soft">
+    <h2 id="h-soft" class="sect">Softmod &amp; glitch matrix</h2>
+    <p class="text-[13px] mb-4 dim">What each board can actually run. <a href="#reference/jtag" class="gl">JTAG</a> and <a href="#reference/rgh" class="gl">RGH</a> depend on the hardware; <b class="acc">BadUpdate is software only</b>, so it works on every revision &mdash; including the two that no glitch hack can touch.</p>
+    <div class="panel overflow-hidden mb-8">
+      <div class="overflow-x-auto">
+        <table class="stack">
           <thead><tr><th>Board</th><th>Tier</th><th>JTAG</th><th>RGH</th><th>BadUpdate</th></tr></thead>
           <tbody>
-            <tr v-for="m in DB.mobos" :key="m.name" v-show="m.compat">
-              <td class="font-bold text-white whitespace-nowrap">{{ m.name }}</td>
-              <td><span v-if="m.tier" :class="'tierbox tier-'+m.tier" class="w-8 h-6 text-[11.5px]">{{ m.tier }}</span></td>
-              <td class="text-[12px]" :style="{color: m.compat.jtag.startsWith('No') ? 'var(--dim)' : 'var(--txt)'}">{{ m.compat.jtag }}</td>
-              <td class="text-[12px]" :style="{color: m.compat.rgh.startsWith('None') ? 'var(--dim)' : 'var(--txt)'}">{{ m.compat.rgh }}</td>
-              <td class="text-[12px] acc">{{ m.compat.badupdate }}</td>
+            <tr v-for="m in DB.mobos.filter(x => x.compat)" :key="m.slug">
+              <td data-label="Board" class="whitespace-nowrap"><button class="linkish hi font-bold" @click="open(m)">{{ m.name }}</button></td>
+              <td data-label="Tier"><tier-box :tier="m.tier" size="sm"></tier-box></td>
+              <td data-label="JTAG" class="text-[12px]" :class="dim(m.compat.jtag) ? 'dim' : ''">{{ m.compat.jtag }}</td>
+              <td data-label="RGH" class="text-[12px]" :class="dim(m.compat.rgh) ? 'dim' : ''">{{ m.compat.rgh }}</td>
+              <td data-label="BadUpdate" class="text-[12px] acc">{{ m.compat.badupdate }}</td>
             </tr>
           </tbody>
         </table>
@@ -297,32 +786,31 @@
     <template v-if="BU">
       <h2 class="sect">{{ BU.name }}</h2>
       <div class="grid lg:grid-cols-2 gap-3">
-        <div class="panel rounded p-4">
-          <div class="chip inline-block px-2 py-0.5 rounded label mb-2" data-on="1">{{ BU.tag }}</div>
-          <p class="text-[13px] text-white leading-relaxed m-0">{{ BU.summary }}</p>
-          <h3 class="label mt-4 mb-1" style="color:var(--dim)">You need</h3>
+        <div class="panel p-4">
+          <div class="chip inline-block px-2 py-0.5 label mb-2" data-on="1">{{ BU.tag }}</div>
+          <p class="text-[13px] hi leading-relaxed m-0">{{ BU.summary }}</p>
+          <h3 class="label mt-4 mb-1 dim">You need</h3>
           <ul class="list-disc ml-5 text-[13px] space-y-1">
             <li v-for="r in BU.requires" :key="r">{{ r }}</li>
           </ul>
-          <h3 class="label mt-4 mb-1.5" style="color:var(--dim)">Releases</h3>
+          <h3 class="label mt-4 mb-1.5 dim">Releases</h3>
           <div class="space-y-1.5">
-            <a v-for="v in BU.variants" :key="v[0]" :href="v[3]" target="_blank" rel="noopener"
-               class="panel rounded flex flex-wrap items-baseline gap-x-2 gap-y-0.5 px-3 py-2 transition-colors">
-              <span class="text-[13px] font-semibold acc">{{ v[0] }}</span>
-              <span class="text-[11.5px]" style="color:var(--dim)">by {{ v[1] }}</span>
-              <span class="text-[12px] basis-full" style="color:var(--dim)">{{ v[2] }}</span>
+            <a v-for="v in BU.variants" :key="v[0]" :href="v[3]" target="_blank" rel="noopener" class="panel card-btn flex flex-wrap items-baseline gap-x-2 gap-y-0.5 px-3 py-2 no-underline">
+              <span class="text-[13px] font-semibold acc">{{ v[0] }} &#8599;</span>
+              <span class="text-[11.5px] dim">by {{ v[1] }}</span>
+              <span class="text-[12px] basis-full dim">{{ v[2] }}</span>
             </a>
           </div>
-          <a :href="BU.link" class="chip inline-block label px-3 py-1.5 rounded mt-3 acc hover:text-white">Free60 write-up &#8599;</a>
+          <a :href="BU.link" target="_blank" rel="noopener" class="btn inline-flex mt-3 acc">Free60 write-up &#8599;</a>
         </div>
-        <div class="panel rounded p-4">
-          <h3 class="label mb-2" style="color:var(--dim)">Trigger games</h3>
-          <div v-for="e in BU.entries" :key="e[0]" class="pb-2 mb-2" style="border-bottom:1px solid var(--line)">
+        <div class="panel p-4">
+          <h3 class="label mb-2 dim">Trigger games</h3>
+          <div v-for="e in BU.entries" :key="e[0]" class="pb-2 mb-2 rule-b">
             <div class="text-[14px] font-semibold acc">{{ e[0] }}</div>
-            <div class="label" style="color:var(--dim)">via {{ e[1] }}</div>
+            <div class="label dim">via {{ e[1] }}</div>
             <div class="text-[12px] mt-0.5">{{ e[2] }}</div>
           </div>
-          <h3 class="label mt-3 mb-1" style="color:var(--dim)">Read this first</h3>
+          <h3 class="label mt-3 mb-1 dim">Read this first</h3>
           <ul class="list-disc ml-5 text-[13px] space-y-0.5">
             <li v-for="c in BU.caveats" :key="c">{{ c }}</li>
           </ul>
@@ -330,100 +818,142 @@
       </div>
     </template>
   </section>
+</template>
 
-  <!-- ================= TAB: RANKING ================= -->
-  <section v-show="tab==='ranking'" class="p-5 sm:p-7">
-    <h2 class="sect">Reliability tier list</h2>
-    <p class="text-[13px] mb-4" style="color:var(--dim)">Scene consensus on how likely a board is to still be alive &mdash; not a performance ranking. Every 360 board performs identically.</p>
-    <div class="panel rounded overflow-hidden mb-8">
-      <div v-for="t in DB.tiers" :key="t.tier" class="flex items-stretch" style="border-bottom:1px solid var(--line)">
-        <div :class="'tierbox tier-'+t.tier" class="tierrail w-16 shrink-0 text-[20px]">{{ t.tier }}</div>
-        <div class="flex flex-wrap gap-2 p-3">
-          <button v-for="i in t.items" :key="i" @click="q=i.split(' ')[0]; go('codes')"
-                  class="chip px-3 py-1 rounded text-[12.5px] cursor-pointer hover:text-white">{{ i }}</button>
-        </div>
-      </div>
-    </div>
-
-    <h2 class="sect">Detailed scoreboard</h2>
-    <div class="panel rounded overflow-hidden">
-      <div class="overflow-x-auto">
-        <table>
-          <thead><tr>
-            <th v-for="c in cols" :key="c[0]" @click="sortBy(c[0])" class="cursor-pointer select-none hover:text-white">
-              {{ c[1] }}<span v-if="sortK===c[0]" class="acc">{{ sortD>0?' ▲':' ▼' }}</span>
-            </th></tr></thead>
-          <tbody>
-            <tr v-for="s in scoreboard" :key="s.board">
-              <td class="mono" style="color:var(--dim)">{{ s.rank }}</td>
-              <td class="font-bold text-white whitespace-nowrap">{{ s.board }}</td>
-              <td style="min-width:140px">
-                <div class="flex items-center gap-2">
-                  <div class="h-1.5 rounded-full flex-1" style="background:var(--panel-2);min-width:56px">
-                    <div class="h-1.5 rounded-full" :style="{width:(s.rel*10)+'%',background:'var(--acc)',boxShadow:'0 0 8px var(--acc)'}"></div>
-                  </div>
-                  <span class="mono text-[11px] acc whitespace-nowrap">{{ s.relText }}</span>
-                </div>
-              </td>
-              <td class="text-[13px]">{{ s.why }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ================= TAB: MODELS ================= -->
-  <section v-show="tab==='models'" class="p-5 sm:p-7">
-    <h2 class="sect">Every Xbox 360 model</h2>
-    <p class="text-[13px] mb-3" style="color:var(--dim)">Three generations &mdash; the original "Phat" (2005), the S / "Slim" (2010) and the E (2013).</p>
+<!-- ============ REFERENCE ============ -->
+<template id="tpl-reference">
+  <section class="view" aria-labelledby="h-ref">
+    <h2 id="h-ref" class="sect">Glossary</h2>
     <div class="flex flex-wrap gap-2 items-center mb-4">
-      <button v-for="g in ['All','Phat','Slim (S)','E']" :key="g" @click="genSel=g" :data-on="genSel===g?'1':'0'"
-              class="chip label px-2.5 py-1 rounded cursor-pointer">{{ g }}</button>
-      <input v-model="mq" placeholder="Filter models..." class="ml-auto px-3.5 py-2 rounded text-[13px] min-w-[170px]"
-             style="background:var(--panel-2);border:1px solid var(--line);color:var(--hi)">
-    </div>
-    <div class="panel rounded overflow-hidden mb-8">
-      <div class="overflow-x-auto">
-        <table>
-          <thead><tr><th>Gen</th><th>SKU</th><th>Years</th><th>Storage</th><th>Finish</th><th>Notes</th></tr></thead>
-          <tbody>
-            <tr v-for="m in models" :key="m.gen+m.sku">
-              <td><span class="chip px-2 py-0.5 rounded mono text-[10px] whitespace-nowrap">{{ m.gen }}</span></td>
-              <td class="font-bold text-white whitespace-nowrap">{{ m.sku }}</td>
-              <td class="mono text-[12.5px] whitespace-nowrap" style="color:var(--dim)">{{ m.years }}</td>
-              <td class="text-[12px]">{{ m.storage }}</td>
-              <td class="text-[12px]" style="color:var(--dim)">{{ m.finish }}</td>
-              <td class="text-[13px]">{{ m.notes }}</td>
-            </tr>
-            <tr v-if="!models.length"><td colspan="6" class="text-center py-8" style="color:var(--dim)">No match</td></tr>
-          </tbody>
-        </table>
+      <input v-model="gq" type="search" placeholder="Find a term: reball, CPU key, eDRAM..." aria-label="Search the glossary" class="field flex-1 min-w-[200px] text-[13px]">
+      <div class="flex flex-wrap gap-1.5" role="group" aria-label="Category">
+        <button @click="cat = ''" :data-on="cat ? '0' : '1'" class="chip label px-2 py-1">All</button>
+        <button v-for="(l, k) in cats" :key="k" @click="cat = cat === k ? '' : k" :data-on="cat === k ? '1' : '0'" :aria-pressed="cat === k" class="chip label px-2 py-1">{{ l }}</button>
       </div>
     </div>
+    <dl class="grid sm:grid-cols-2 gap-3 m-0">
+      <div v-for="g in terms" :key="g.slug" :id="'term-' + g.slug" class="panel p-3.5 scroll-mt-20" :data-flash="flash === g.slug ? '1' : '0'">
+        <dt class="flex items-baseline gap-2">
+          <span class="text-[15px] font-semibold hi">{{ g.term }}</span>
+          <span v-if="g.aka.length" class="text-[11.5px] dim truncate">{{ g.aka.join(', ') }}</span>
+          <button class="icon-btn ml-auto self-center" @click="copy(linkTo('reference/' + g.slug), 'Link copied')" :aria-label="'Copy link to ' + g.term" title="Copy link"><icon n="link" :s="14"></icon></button>
+        </dt>
+        <dd class="m-0 mt-1 text-[13px]">{{ g.def }}</dd>
+        <dd class="m-0 mt-1.5"><span class="label dim">{{ cats[g.cat] }}</span></dd>
+      </div>
+    </dl>
+    <p v-if="!terms.length" class="dim text-[13px]">No term matches "{{ gq }}". <a :href="issueUrl('Glossary: ' + gq)" target="_blank" rel="noopener" class="acc">Suggest it &#8599;</a></p>
 
-    <h2 class="sect">Notable limited &amp; special editions</h2>
-    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-      <article v-for="e in editions" :key="e.name" class="panel rounded p-3">
-        <h3 class="text-[14px] font-semibold text-white m-0">{{ e.name }}</h3>
-        <div class="label mb-1.5" style="color:var(--dim)">{{ e.year }} · {{ e.chassis }}</div>
-        <div v-if="e.board" class="flex items-baseline gap-1.5 mb-1.5">
-          <span class="label shrink-0" style="color:var(--acc)">Likely board</span>
-          <span class="text-[12px]">{{ e.board }}</span>
+    <h2 class="sect mt-10">Timeline</h2>
+    <div class="panel p-4 mb-4 overflow-x-auto">
+      <svg :viewBox="'0 0 ' + tl.W + ' 96'" class="w-full min-w-[640px]" role="img" aria-label="Timeline overview: boards, hacks and events from 2005 to 2025">
+        <g class="tl-axis">
+          <line x1="20" :x2="tl.W - 20" y1="78" y2="78"></line>
+          <g v-for="t in tl.ticks" :key="t.y">
+            <line :x1="t.x" :x2="t.x" y1="75" y2="81"></line>
+            <text v-if="t.y % 2 === 1" :x="t.x" y="93" text-anchor="middle">{{ t.y }}</text>
+          </g>
+        </g>
+        <g v-for="e in tl.ev" :key="e.date + e.label" :class="['tl-dot', 'tl-' + e.kind, e.board ? 'tl-link' : '']" @click="openEvent(e)">
+          <circle :cx="e.x" :cy="e.y" r="6"></circle>
+          <title>{{ e.date }} · {{ e.label }}</title>
+        </g>
+      </svg>
+      <div class="flex gap-4 text-[11.5px] dim mt-1">
+        <span class="tl-board"><span class="tl-key"></span>Board</span><span class="tl-hack"><span class="tl-key"></span>Hack</span><span class="tl-event"><span class="tl-key"></span>Event</span>
+      </div>
+    </div>
+    <ol class="tl-list">
+      <li v-for="y in byYear" :key="y.y">
+        <div class="tl-year mono">{{ y.y }}</div>
+        <ul>
+          <li v-for="e in y.ev" :key="e.label" :class="'tl-' + e.kind">
+            <span class="tl-key" aria-hidden="true"></span>
+            <span class="label dim w-[52px] shrink-0">{{ kindLabel(e.kind) }}</span>
+            <button v-if="e.board" class="linkish text-left text-[13px]" @click="openEvent(e)">{{ e.label }}</button>
+            <span v-else class="text-[13px]">{{ e.label }}</span>
+          </li>
+        </ul>
+      </li>
+    </ol>
+    <p class="text-[11.5px] dim">Months are approximate; regional launches and production changeovers overlapped.</p>
+  </section>
+</template>
+
+<!-- ============ MY CONSOLES ============ -->
+<template id="tpl-consoles">
+  <section class="view" aria-labelledby="h-cons">
+    <div class="flex flex-wrap items-end justify-between gap-3 sect-row">
+      <h2 id="h-cons" class="sect m-0 border-0 p-0">My consoles</h2>
+      <div class="flex flex-wrap gap-2">
+        <button @click="add" class="btn btn-acc">+ Add console</button>
+        <button @click="exportAll" class="btn" :disabled="!S.consoles.length">Export</button>
+        <label class="btn cursor-pointer">Import<input type="file" accept="application/json,.json" class="sr-only" @change="importFile"></label>
+      </div>
+    </div>
+    <p class="text-[13px] mb-4 dim">A repair log for the consoles on your bench. It is stored only in this browser &mdash; export it now and then to keep a backup or move it to another device.</p>
+
+    <div v-if="!S.consoles.length" class="panel p-8 text-center">
+      <p class="hi text-[15px] m-0 mb-1">No consoles yet</p>
+      <p class="dim text-[13px] m-0 mb-4">Add one here, or decode a code and use <b>Save to repair log</b>.</p>
+      <button @click="add" class="btn btn-acc">+ Add your first console</button>
+    </div>
+
+    <div v-else class="grid md:grid-cols-[260px_1fr] gap-4 items-start">
+      <ul class="m-0 p-0 list-none space-y-1.5">
+        <li v-for="c in list" :key="c.id">
+          <button @click="open(c)" class="cand" :data-on="sel && sel.id === c.id ? '1' : '0'">
+            <span class="min-w-0 text-left">
+              <span class="block hi font-medium truncate">{{ c.name }}</span>
+              <span class="block text-[11.5px] dim truncate">{{ c.board || c.chassis || 'Unknown board' }} · {{ c.codes.length }} code{{ c.codes.length === 1 ? '' : 's' }}</span>
+            </span>
+            <span class="status" :data-s="c.status">{{ statusLabel(c.status) }}</span>
+          </button>
+        </li>
+      </ul>
+
+      <div v-if="sel" class="panel p-4 sm:p-5">
+        <div class="grid sm:grid-cols-2 gap-3">
+          <label class="fld"><span class="label dim">Name</span><input v-model="sel.name" @input="touch" class="field"></label>
+          <label class="fld"><span class="label dim">Status</span>
+            <select v-model="sel.status" @change="touch" class="field"><option v-for="s in statuses" :key="s[0]" :value="s[0]">{{ s[1] }}</option></select></label>
+          <label class="fld"><span class="label dim">Chassis</span>
+            <select v-model="sel.chassis" @change="touch" class="field"><option value="">Unknown</option><option>Phat</option><option>Slim (S)</option><option>E</option></select></label>
+          <label class="fld"><span class="label dim">Board</span>
+            <select v-model="sel.board" @change="touch" class="field"><option value="">Unknown</option><option v-for="b in boards" :key="b.slug" :value="b.name">{{ b.name }}</option></select></label>
+          <label class="fld"><span class="label dim">Manufacture date</span><input v-model="sel.mfg" @input="touch" class="field" placeholder="e.g. 2008-06"></label>
+          <label class="fld"><span class="label dim">Serial</span><input v-model="sel.serial" @input="touch" class="field mono" placeholder="Rear sticker"></label>
         </div>
-        <p class="text-[12px] m-0">{{ e.notes }}</p>
-      </article>
+        <p v-if="!sel.board" class="text-[12px] dim mt-2 mb-0">Not sure of the board? <a href="#identify" class="acc">Identify it</a>.</p>
+
+        <h3 class="label dim mt-5 mb-2">Codes seen</h3>
+        <form class="flex gap-2 mb-2" @submit.prevent="log">
+          <input v-model="addCode" class="field mono w-36" placeholder="0102 or E74" aria-label="Code to log">
+          <button class="btn">Log code</button>
+        </form>
+        <ul v-if="sel.codes.length" class="m-0 p-0 list-none rule-t">
+          <li v-for="(x, i) in sel.codes" :key="x.at + x.code" class="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 rule-b text-[12.5px]">
+            <button class="code-pill" @click="loadCode(x.code)">{{ x.code }}</button>
+            <span class="mono dim">{{ crossRef(x.code) }}</span>
+            <span class="flex-1 min-w-[160px]">{{ rowOf(x.code) ? rowOf(x.code).sys + ' — ' + rowOf(x.code).fix.split('. ')[0] : 'Undocumented code' }}</span>
+            <span class="dim text-[11.5px]">{{ fmtDate(x.at) }}</span>
+            <button class="icon-btn" @click="unlog(i)" :aria-label="'Remove ' + x.code"><icon n="x" :s="14"></icon></button>
+          </li>
+        </ul>
+        <p v-else class="text-[12.5px] dim m-0">Nothing logged yet.</p>
+
+        <label class="fld mt-5"><span class="label dim">Notes</span>
+          <textarea v-model="sel.notes" @input="touch" rows="5" class="field" placeholder="What you tried, parts ordered, temperatures..."></textarea></label>
+
+        <div class="flex flex-wrap items-center gap-2 mt-4 pt-3 rule-t">
+          <button @click="print(sel)" class="btn"><icon n="print" :s="14"></icon> Print sheet</button>
+          <span class="text-[11.5px] dim">Updated {{ fmtDate(sel.updated) }}</span>
+          <button @click="remove(sel)" class="btn btn-danger ml-auto">{{ confirmDel === sel.id ? 'Click again to delete' : 'Delete' }}</button>
+        </div>
+      </div>
+      <div v-else class="panel p-8 text-center dim text-[13px]">Pick a console on the left.</div>
     </div>
   </section>
-
-  <footer class="px-5 sm:px-7 py-7 text-[12.5px] flex flex-wrap gap-x-4 gap-y-1 justify-between" style="color:var(--dim);border-top:1px solid var(--line-2)">
-    <span>360 Diagnostic Wiki &mdash; community reference, no warranty. Verify before you reball.</span>
-    <a href="https://github.com/nat649/ultimate-xbox360-diags" class="acc hover:underline transition-colors">Source on GitHub &#8599;</a>
-  </footer>
-
-  <div v-if="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 panel px-5 py-2.5 text-[13px] acc z-50 noprint"
-       style="box-shadow:0 0 24px rgba(0,0,0,.7)">{{ toast }}</div>
-</div>
-<script src="app.js"></script>
+</template>
 </body>
 </html>

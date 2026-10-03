@@ -7,41 +7,47 @@ database, motherboard revisions, softmod compatibility and every retail model.
 
 ## What's in it
 
-- **Ring of Light decoder** — click the quadrants the way you'd count them off the console
-  and the diagnosis resolves live, with severity, fix difficulty, deeper notes and links to
-  related codes. Deep-linkable: `#decoder/0102`.
-- **E-code ↔ secondary converter** — the secondary code is simply the dashboard E-code
-  written in base 4 (E74 = 1022, E68 = 1010, E73 = 1021), so the two convert both ways and
-  every row cross-references.
-- **Error code database** — fuzzy search (Fuse.js) across codes, boards and fix text.
-  Searching `E74` or `74` also resolves through the base-4 relationship. Filter by
-  subsystem, click any row to expand.
-- **Motherboards** — per-revision specs (CPU/GPU process, NAND, DVD drives shipped), an
-  RROD risk bar, what fails first, and modding notes.
-- **Softmods** — JTAG / RGH / BadUpdate compatibility matrix plus a BadUpdate reference
-  (requirements, entry points including ABadAvatar, and the non-persistence caveat).
-  BadUpdate is software only, so it reaches Winchester and Corona V6 — the two boards no
-  glitch hack can touch.
-- **Ranking** — reliability tier list and a sortable scoreboard.
-- **Models** — every retail SKU by generation, plus the limited editions.
+- **Ring of Light decoder.** Click the quadrants the way you'd count them off the console, or type
+  `0`–`3`, and the diagnosis resolves live. Each result shows severity, fix difficulty, the tools you'll
+  need, which boards it typically hits, and related codes. A **guided reading** mode walks you through
+  Sync + Eject one digit at a time. Deep-linkable: `#decoder/0102`.
+- **What the lights mean.** The primary light patterns for Phat, S and E consoles, plus the power brick LED.
+- **E-code ↔ secondary converter.** The secondary code is the dashboard E-code written in base 4
+  (E74 = 1022, E68 = 1010, E73 = 1021), so the two convert both ways. The decoder finds a row either way.
+- **Troubleshooter.** A branching symptom checker (no power, no picture, red lights, freezes, disc,
+  heat). Every step has its own shareable link.
+- **Error code database.** Fuzzy search (Fuse.js) across codes, boards and fix text, with severity and
+  sub-system filters, sortable columns, and a link to every row (`#codes/0102`).
+- **Identify my board.** Answer chassis, HDMI, brick wattage and manufacture date to narrow it down to a
+  board revision, with a confidence score.
+- **Motherboards.** Per-revision specs, an RROD risk bar, what fails first, modding notes, and side-by-side
+  **compare** for up to three boards.
+- **Softmods, Ranking, Models.** The JTAG / RGH / BadUpdate matrix, the reliability tier list and
+  scoreboard, and every retail SKU and limited edition.
+- **Reference.** A glossary that auto-links terms across the site, and a timeline of board revisions and hacks.
+- **My consoles.** A repair log stored in your browser: board, status, codes seen and notes, with a
+  printable repair sheet and JSON export/import.
 
-Four phosphor themes, a CRT scanline toggle, `/` to search, `1`–`6` for tabs, and on the
-decoder tab the `0`–`3` keys shift digits in like tapping Eject.
+Everywhere: `Ctrl K` (or `/`) searches the whole site; `1`–`0` switch tabs (`Alt`+number on the
+decoder, where digits enter the code); you can pin codes and boards; there are dark, light and system
+themes, four accent colours and an optional CRT scanline effect. On phones there is a bottom tab bar,
+and once you've visited, the site installs as an app and works offline.
 
 ## Structure
 
-No build step — static files, so GitHub Pages serves it as-is. Vue 3, Tailwind and Fuse.js
-load from CDN.
+No build step. The files are static, so GitHub Pages serves them as-is. Vue 3, Tailwind and Fuse.js
+load from CDN, and the app is plain ES modules.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The app shell and all markup (Vue 3 in-DOM templates) |
-| `app.js` | Vue app: decoder, search, filters, routing, persistence |
-| `app.css` | CRT/scene theme layer (CSS custom properties) |
-| `data.js` | The whole dataset — **edit this to add or correct content** |
-| `extract.mjs` / `enrich.mjs` / `gen.mjs` | One-off pipeline that lifted the data out of the original page and layered the extra detail on. Not needed at runtime. |
-| `index.legacy.html` | The original single-file version, kept for reference |
-| `backup/terminal-ui-2026-09-04/` | Snapshot taken before an experiment; safe to delete |
+| `data.js` | The whole dataset. **Edit this to add or correct content.** |
+| `index.html` | App shell and one template per view. |
+| `js/` | The Vue app: `main.js` (root), `store.js` (state + router), `lib.js` (helpers), `views/` (one per tab). |
+| `app.css` | Theme tokens (dark/light), components and the print sheet. |
+| `sw.js`, `manifest.webmanifest`, `icon*` | Offline support and install metadata. |
+| `tools/validate.py` | Data integrity checks. CI runs it on every PR. |
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the data schema.
 
 ### Adding an error code
 
@@ -56,10 +62,14 @@ Append to `window.DIAGS.errors` in `data.js`:
   related: ["0033", "0110"] }
 ```
 
+Then run `python3 tools/validate.py`.
+
 ## Local preview
 
 ```bash
-python -m http.server 8765
+python3 -m http.server 8765
 ```
+
+It has to be served: ES modules don't load from `file://`.
 
 Corrections welcome — this is community knowledge, verify before you reball.
